@@ -7,7 +7,7 @@ import Login from '../views/onBoard/Login.vue';
 import Home from '../views/Home.vue';
 
 const routes = [
-    // General
+    // onBoard
     {
         path: '/identity/login',
         name: 'identity-login',

@@ -32,7 +32,8 @@
                 <div class="w-full flex flex-col gap-[8px]">
                     <div v-if="!store.accounts.data || store.accounts.data.length === 0 && !store.accounts.loading"
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
-                        <p>There are no accounts in this vault</p>
+                        <p v-if="false">There are no accounts in this vault</p>
+                        <p>{{ $t('no_found_accounts') }}</p>
                         <buttonFl type="secondary" size="small" :hasIcon="false" label="Add account" />
                     </div>
                     <cardAccount v-if="!store.accounts.loading" v-for="(account, accountIndex) in store.accounts.data"
@@ -172,6 +173,12 @@ export default {
                 return false;
             }
 
+            if (!this.auth.user && !this.auth.profile) {
+                this.$router.push({ name: 'identity-login' });
+                this.store.modals.createVault.loading = false;
+                return this.store.modals.createVault.loading = false;
+            }
+
             try {
                 const { data, error } = await supabase
                     .from('profile_vaults')
@@ -228,6 +235,13 @@ export default {
             if (!this.store.modals.createVault.data.name) {
                 this.store.modals.createVault.error.name = "The name is required.";
                 this.store.modals.createVault.loading = false;
+                return this.store.modals.createVault.loading = false;
+            }
+
+            if (!this.auth.user && !this.auth.profile) {
+                this.$router.push({ name: 'identity-login' });
+                this.store.modals.createVault.loading = false;
+                return this.store.modals.createVault.loading = false;
             }
 
             const fieldData = this.store.modals.createVault.data;

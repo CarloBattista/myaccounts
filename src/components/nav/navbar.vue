@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { auth } from '../../data/auth';
+
 import avatar from '../avatar/avatar.vue';
 import buttonFl from '../button/button-fl.vue';
 
@@ -27,6 +29,11 @@ export default {
     components: {
         avatar,
         buttonFl
+    },
+    data() {
+        return {
+            auth
+        }
     }
 }
 </script>
