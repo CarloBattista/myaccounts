@@ -1,9 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+// onBoard
+import Login from '../views/onBoard/Login.vue';
+
 // General
 import Home from '../views/Home.vue';
 
 const routes = [
+    // General
+    {
+        path: '/identity/login',
+        name: 'identity-login',
+        component: Login,
+        props: true,
+        meta: { title: "MyAccounts" }
+    },
+
     // General
     {
         path: '/',
