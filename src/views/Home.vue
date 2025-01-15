@@ -3,7 +3,7 @@
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
-                <!-- button add vault -->
+                <buttonFl type="outline" size="small" :hasIcon="false" label="Create vault" class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
                     <navItem @click="selectedVault(vault)" v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex" :data="vault" :hasIcon="true"
                         :label="vault.vaults?.name">
@@ -23,7 +23,7 @@
                     </div>
                 </div>
                 <div class="w-full flex flex-col gap-[8px]">
-                    <div v-if="!store.accounts.data || store.accounts.data.length === 0" class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
+                    <div v-if="!store.accounts.data || store.accounts.data.length === 0 && !store.accounts.loading" class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
                         <p>There are no accounts in this vault</p>
                         <buttonFl type="secondary" size="small" :hasIcon="false" label="Add account" />
                     </div>
