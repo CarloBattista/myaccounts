@@ -41,6 +41,10 @@ export default {
                     this.auth.user = data.user;
                     this.auth.session = data.session;
                     this.auth.isAuthenticated = true;
+
+                    // Clear inputs after login
+                    this.fields.data.email = "";
+                    this.fields.data.password = "";
                 }
             } catch (e) {
                 console.error(e);
