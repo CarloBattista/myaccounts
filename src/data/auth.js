@@ -5,4 +5,6 @@ export const auth = reactive({
     session: null,
     profile: null,
     isAuthenticated: false,
+
+    PROFILE_AUTH_ID: null,
 });

@@ -73,6 +73,16 @@ export default {
       },
       deep: true
     },
+    'auth.profile': {
+      handler(value) {
+        if (value && value.id) {
+          this.auth.PROFILE_AUTH_ID = value.id;
+        } else {
+          this.auth.PROFILE_AUTH_ID = null;
+        }
+      },
+      deep: true
+    },
   }
 }
 </script>
