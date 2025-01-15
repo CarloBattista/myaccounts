@@ -51,6 +51,16 @@
                     <inputField type="text" forInput="username" label="" placeholder="Username" :required="true" :error="null" />
                     <inputField type="email" forInput="email" label="" placeholder="Email" :required="true" :error="null" />
                     <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
                     <buttonFl type="primary" size="default" :hasIcon="false" label="Create vault" class="w-full" />
                 </form>
             </template>

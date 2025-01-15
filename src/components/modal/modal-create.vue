@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed z-[999999] top-0 left-0 w-full min-h-screen flex items-end sm:items-center justify-center pointer-events-none">
+    <div class="fixed z-[999999] top-0 left-0 w-full pt-[30px] max-h-screen flex items-start justify-center pointer-events-none overflow-y-auto">
         <div class="w-full sm:max-w-[560px] rounded-t-[16px] sm:rounded-[16px] bg-[#1E1E1E] pointer-events-auto">
             <div class="header w-full h-[64px]"></div>
             <div class="body w-full min-h-[100px] px-[32px] py-[24px] ">
