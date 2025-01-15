@@ -1,18 +1,26 @@
 <template>
   <div>
     <RouterView />
+    <toast v-if="false" />
   </div>
 </template>
 
 <script>
 import { supabase } from "./lib/supabase";
 import { auth } from "./data/auth";
+import { store } from "./data/store";
+
+import toast from "./components/toast/toast.vue";
 
 export default {
   name: "App",
+  components: {
+    toast
+  },
   data() {
     return {
-      auth
+      auth,
+      store
     }
   },
   methods: {
@@ -79,6 +87,16 @@ export default {
           this.auth.PROFILE_AUTH_ID = value.id;
         } else {
           this.auth.PROFILE_AUTH_ID = null;
+        }
+      },
+      deep: true
+    },
+    'store.modals': {
+      handler(value) {
+        if (value.createVault.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
         }
       },
       deep: true

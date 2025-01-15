@@ -1,5 +1,5 @@
 <template>
-    <button class="btn-fl rounded-full flex items-center font-medium" :class="'color-'+type, 'size-'+size">
+    <button class="btn-fl rounded-full flex items-center justify-center font-medium" :class="'color-'+type, 'size-'+size">
         <div v-if="hasIcon">
             <slot name="icon"></slot>
         </div>

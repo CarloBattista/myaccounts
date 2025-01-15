@@ -3,7 +3,7 @@
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
-                <buttonFl type="outline" size="small" :hasIcon="false" label="Create vault" class="w-fit" />
+                <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline" size="small" :hasIcon="false" label="Create vault" class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
                     <navItem @click="selectedVault(vault)" v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex" :data="vault" :hasIcon="true"
                         :label="vault.vaults?.name">
@@ -33,6 +33,29 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL -->
+    <Transition name="overlay-modal-fade">
+        <div v-if="store.modals.createVault.open" @click="closeModal" class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
+    </Transition>
+    <Transition name="modal-fade">
+        <modalCreate v-if="store.modals.createVault.open" title="Create a new vault">
+            <template #inner>
+                <form @submit.prevent class="w-full flex flex-col gap-[16px]">
+                    <inputField type="text" forInput="name" label="" placeholder="Name" :required="true" :error="null" />
+                    <div class="separator relative mt-6 flex gap-[12px] items-center justify-center">
+                        <div class="separator-start"></div>
+                        <span class="flex flex-none">Account section</span>
+                        <div class="separator-end"></div>
+                    </div>
+                    <inputField type="text" forInput="username" label="" placeholder="Username" :required="true" :error="null" />
+                    <inputField type="email" forInput="email" label="" placeholder="Email" :required="true" :error="null" />
+                    <inputField type="password" forInput="password" label="" placeholder="Password" :required="true" :error="null" />
+                    <buttonFl type="primary" size="default" :hasIcon="false" label="Create vault" class="w-full" />
+                </form>
+            </template>
+        </modalCreate>
+    </Transition>
 </template>
 
 <script>
@@ -44,6 +67,8 @@ import navbar from '../components/nav/navbar.vue';
 import navItem from '../components/nav/nav-item.vue';
 import cardAccount from '../components/card/card-account.vue';
 import buttonFl from '../components/button/button-fl.vue';
+import modalCreate from '../components/modal/modal-create.vue';
+import inputField from '../components/input/input-field.vue';
 
 // ICONS
 import { Vault } from 'lucide-vue-next';
@@ -55,6 +80,8 @@ export default {
         navItem,
         cardAccount,
         buttonFl,
+        modalCreate,
+        inputField,
 
         // ICONS
         Vault
@@ -165,6 +192,12 @@ export default {
                 console.error(e);
             } finally {
                 this.store.selectedVault.loading = false;
+            }
+        },
+
+        closeModal() {
+            if (this.store.modals.createVault.open) {
+                this.store.modals.createVault.open = false;
             }
         }
     },

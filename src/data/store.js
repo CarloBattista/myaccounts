@@ -11,11 +11,21 @@ export const store = reactive({
         error: null,
         loading: false
     },
-    
     selectedVault: {
         data: {},
         vault_id: null,
         error: null,
         loading: false
+    },
+
+    modals: {
+        createVault: {
+            open: false,
+            data: {
+                name: ""
+            },
+            error: null,
+            loading: false
+        }
     }
 });
