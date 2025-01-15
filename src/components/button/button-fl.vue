@@ -1,20 +1,27 @@
 <template>
     <button class="btn-fl rounded-full flex items-center justify-center font-medium" :class="'color-'+type, 'size-'+size">
-        <div v-if="hasIcon">
+        <loader v-if="loading" />
+        <div v-if="hasIcon && !loading">
             <slot name="icon"></slot>
         </div>
-        <span v-if="label">{{ label }}</span>
+        <span v-if="label && !loading" class="whitespace-nowrap">{{ label }}</span>
     </button>
 </template>
 
 <script>
+import loader from '../loader/loader.vue'
+
 export default {
     name: "button-fl",
+    components: {
+        loader
+    },
     props: {
         type: String,
         size: String,
         hasIcon: Boolean,
-        label: String
+        label: String,
+        loading: Boolean
     }
 }
 </script>

@@ -22,9 +22,21 @@ export const store = reactive({
         createVault: {
             open: false,
             data: {
-                name: ""
+                name: null,
             },
-            error: null,
+            error: {
+                name: null,
+            },
+            loading: false
+        },
+        editVault: {
+            open: false,
+            data: {
+                name: null,
+            },
+            error: {
+                name: null,
+            },
             loading: false
         }
     }
