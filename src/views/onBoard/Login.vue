@@ -45,6 +45,9 @@ export default {
                     // Clear inputs after login
                     this.fields.data.email = "";
                     this.fields.data.password = "";
+
+                    // Push user to home after login
+                    this.$router.push({ name: 'home' });
                 }
             } catch (e) {
                 console.error(e);
