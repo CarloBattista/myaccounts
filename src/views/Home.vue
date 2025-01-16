@@ -111,8 +111,9 @@
         <modalCreate v-if="store.modals.createAccount.open" title="Add a new account">
             <template #inner>
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
-                    <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
-                        placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
+                    <inputField @input="getLogoWeb" v-model="store.modals.createAccount.data.name" type="text"
+                        forInput="name" label="" placeholder="Name" :required="true"
+                        :error="store.modals.createAccount.error.name" />
                     <dropdown label="Select the vault where you want to place the account"
                         :selected="store.modals.createAccount.data.vault_name_selected"
                         :error="store.modals.createAccount.error.vault_id">
@@ -854,7 +855,43 @@ export default {
                 console.error(e);
             }
         },
+        async getLogoWeb() {
+            const domain = this.store.modals.createAccount.data.name.toLowerCase();
+            const apiKey = import.meta.env.VITE_LOGO_DEV_API_KEY;
+            const size = 256;
 
+            try {
+                const apiUrl = `https://img.logo.dev/${domain}.com?token=${apiKey}&size=${size}&retina=true`;
+
+                const res = await fetch(apiUrl, {
+                    headers: {
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                });
+
+                if (res.ok) {
+                    const logoBlob = await res.blob();
+                    const logo = URL.createObjectURL(logoBlob);
+
+                    this.store.modals.createAccount.data.account_image = logo;
+                } else {
+                    console.warn(res);
+                    this.store.modals.createAccount.data.account_image = null;
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.createAccount.data.account_image = null;
+            }
+        },
+
+        initDebouncedLogoFetch() {
+            this.getLogoWeb = this.debounce(() => {
+                const domain = this.store.modals.createAccount.data.name;
+                if (domain) {
+                    this.fetchLogo(domain);
+                }
+            }, 500); // Ritardo di 500 ms
+        },
         closeModal() {
             if (this.store.modals.createVault.open) {
                 this.store.modals.createVault.open = false;
@@ -936,6 +973,14 @@ export default {
             this.store.contextMenu.open = false;
             this.store.contextMenu.x = 0;
             this.store.contextMenu.y = 0;
+        },
+
+        debounce(func, delay) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
         },
     },
     watch: {
@@ -1061,6 +1106,10 @@ export default {
                 }
             },
             deep: true
+        },
+        'store.modals.createAccount.data.name': {
+            handler: "getLogoWeb",
+            immediate: true,
         },
     }
 }

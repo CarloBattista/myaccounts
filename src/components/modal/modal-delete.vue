@@ -14,7 +14,7 @@
                     </div>
                 </div>
             </div>
-            <div class="body w-full p-[24px] pt-[8px] text-[#989898] text-sm font-normal text-center">
+            <div class="body w-full p-[24px] pt-[8px] text-[#989898] text-sm font-normal text-center text-balance">
                 <p v-if="paragraph">{{ paragraph }}</p>
             </div>
             <div class="footer w-full px-[16px] py-[12px]">
