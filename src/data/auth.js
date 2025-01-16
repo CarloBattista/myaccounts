@@ -7,4 +7,6 @@ export const auth = reactive({
     isAuthenticated: false,
 
     PROFILE_AUTH_ID: null,
+
+    lang: "en",
 });

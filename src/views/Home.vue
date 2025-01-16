@@ -6,8 +6,9 @@
                 <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline"
                     size="small" :hasIcon="false" label="Create vault" class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
-                    <navItem @click="selectedVault(vault)" v-for="(vault, vaultIndex) in store.vaults.data"
-                        :key="vaultIndex" :data="vault" :hasIcon="true" :label="vault.vaults?.name">
+                    <navItem @click="selectedVault(vault)" @contextmenu.prevent="showContextMenu($event, vault)"
+                        v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex" :data="vault" :hasIcon="true"
+                        :label="vault.vaults?.name">
                         <template #icon>
                             <Vault size="20px" />
                         </template>
@@ -20,7 +21,7 @@
                         class="w-[unset] flex gap-[24px] py-[4px] px-[20px] my-[-4px] mx-[calc(20px*-1)] overflow-x-auto scrollbar-none">
                         <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline"
                             size="small" :hasIcon="false" label="Create vault" class="w-fit" />
-                        <div @click="selectedVault(vault)" v-for="(vault, vaultIndex) in store.vaults.data"
+                        <div @click="selectedVault(vault)" @contextmenu.prevent="showContextMenu($event, vault)" v-for="(vault, vaultIndex) in store.vaults.data"
                             :key="vaultIndex"
                             class="navItem flex gap-[8px] items-center text-base font-medium whitespace-nowrap cursor-pointer"
                             :class="{ 'selected-vault': store.selectedVault.data.vaults?.id === vault.vaults?.id }">
@@ -84,12 +85,32 @@
             </template>
         </modalCreate>
     </Transition>
+
+    <!-- CONTEXT MENU -->
+    <Transition name="contextmenu-fade">
+        <contextMenu v-if="store.contextMenu.open"
+            :style="{ top: `${store.contextMenu.y}px`, left: `${store.contextMenu.x}px` }"
+            :data="store.contextMenu.data">
+            <template #inner>
+
+                <div class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                    <Pencil size="20" />
+                    <span>Edit vault</span>
+                </div>
+                <div class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                    <Trash2 size="20" />
+                    <span>Delete vault</span>
+                </div>
+
+            </template>
+        </contextMenu>
+    </Transition>
 </template>
 
 <script>
 import { supabase } from '../lib/supabase';
-import { store } from '../data/store';
 import { auth } from '../data/auth';
+import { store } from '../data/store';
 
 import navbar from '../components/nav/navbar.vue';
 import navItem from '../components/nav/nav-item.vue';
@@ -97,10 +118,10 @@ import cardAccount from '../components/card/card-account.vue';
 import buttonFl from '../components/button/button-fl.vue';
 import modalCreate from '../components/modal/modal-create.vue';
 import inputField from '../components/input/input-field.vue';
+import contextMenu from '../components/menu/context-menu.vue';
 
 // ICONS
-import { Vault } from 'lucide-vue-next';
-import { data } from 'autoprefixer';
+import { Vault, Pencil, Trash2 } from 'lucide-vue-next';
 
 export default {
     name: "Home",
@@ -111,9 +132,12 @@ export default {
         buttonFl,
         modalCreate,
         inputField,
+        contextMenu,
 
         // ICONS
-        Vault
+        Vault,
+        Pencil,
+        Trash2
     },
     data() {
         return {
@@ -309,6 +333,12 @@ export default {
             if (this.store.modals.editVault.open) {
                 this.store.modals.editVault.open = false;
             }
+        },
+        showContextMenu(event) {
+            event.preventDefault();
+            this.store.contextMenu.open = true;
+            this.store.contextMenu.x = event.clientX;
+            this.store.contextMenu.y = event.clientY;
         },
     },
     watch: {

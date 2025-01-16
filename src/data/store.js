@@ -39,5 +39,12 @@ export const store = reactive({
             },
             loading: false
         }
+    },
+
+    contextMenu: {
+        open: false,
+        x: 0,
+        y: 0,
+        data: null
     }
 });

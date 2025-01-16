@@ -10,6 +10,8 @@ import { supabase } from "./lib/supabase";
 import { auth } from "./data/auth";
 import { store } from "./data/store";
 
+import i18n from "./lib/i18n";
+
 import toast from "./components/toast/toast.vue";
 
 export default {
@@ -67,6 +69,21 @@ export default {
         console.error(e);
       }
     },
+
+    getLang() {
+      const lang = this.auth.profile.lang;
+      const fallbackLang = "en";
+
+      if (lang) {
+        this.auth.lang = lang;
+        this.$i18n.locale = lang;
+        localStorage.setItem('locale', lang);
+      } else {
+        this.auth.lang = fallbackLang;
+        this.$i18n.locale = fallbackLang;
+        localStorage.setItem('locale', fallbackLang);
+      }
+    }
   },
   mounted() {
     this.getUser();
@@ -88,6 +105,8 @@ export default {
         } else {
           this.auth.PROFILE_AUTH_ID = null;
         }
+
+        this.getLang();
       },
       deep: true
     },
@@ -99,6 +118,18 @@ export default {
           document.body.classList.remove("overflow-hidden");
         }
       },
+      immediate: true,
+      deep: true
+    },
+    'store.contextMenu': {
+      handler(value) {
+        if (value.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
+      },
+      immediate: true,
       deep: true
     },
   }
