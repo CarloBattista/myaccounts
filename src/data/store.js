@@ -19,6 +19,7 @@ export const store = reactive({
     },
 
     modals: {
+        // VAULT
         createVault: {
             open: false,
             data: {
@@ -46,9 +47,60 @@ export const store = reactive({
             error: null,
             loading: false
         },
+
+        // ACCOUNT
+        createAccount: {
+            open: false,
+            data: {
+                id: null,
+                name: null,
+                username: null,
+                email: null,
+                password: null,
+                description: null,
+                website_url: null
+            },
+            error: {
+                name: null,
+                username: null,
+                email: null,
+                password: null,
+                description: null,
+                website_url: null
+            },
+            loading: false
+        },
+        editAccount: {
+            open: false,
+            data: {
+                id: null,
+                name: null,
+                username: null,
+                email: null,
+                password: null,
+                description: null,
+                website_url: null
+            },
+            error: {
+                name: null,
+                username: null,
+                email: null,
+                password: null,
+                description: null,
+                website_url: null
+            },
+            loading: false
+        },
+        deleteAccount: {
+            open: false,
+            data: {},
+            error: null,
+            loading: false
+        },
     },
 
     contextMenu: {
+        type: null,
         open: false,
         x: 0,
         y: 0,

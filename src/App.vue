@@ -117,6 +117,30 @@ export default {
         } else {
           document.body.classList.remove("overflow-hidden");
         }
+
+        if (value.editVault.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
+
+        if (value.deleteVault.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
+
+        if (value.createAccount.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
+
+        if (value.editAccount.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
       },
       immediate: true,
       deep: true

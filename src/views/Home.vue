@@ -6,7 +6,8 @@
                 <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline"
                     size="small" :hasIcon="false" label="Create vault" class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
-                    <navItem @click="selectedVault(vault)" @contextmenu.prevent="showContextMenu($event, vault)"
+                    <navItem @click="selectedVault(vault)"
+                        @contextmenu.prevent="showContextMenu($event, vault, 'vault')"
                         v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex" :data="vault" :hasIcon="true"
                         :label="vault.vaults?.name">
                         <template #icon>
@@ -21,7 +22,8 @@
                         class="w-[unset] flex gap-[24px] py-[4px] px-[20px] my-[-4px] mx-[calc(20px*-1)] overflow-x-auto scrollbar-none">
                         <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline"
                             size="small" :hasIcon="false" label="Create vault" class="w-fit" />
-                        <div @click="selectedVault(vault)" @contextmenu.prevent="showContextMenu($event, vault)"
+                        <div @click="selectedVault(vault)"
+                            @contextmenu.prevent="showContextMenu($event, vault, 'vault')"
                             v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex"
                             class="navItem flex gap-[8px] items-center text-base font-medium whitespace-nowrap cursor-pointer"
                             :class="{ 'selected-vault': store.selectedVault.data.vaults?.id === vault.vaults?.id }">
@@ -34,13 +36,16 @@
                     <div v-if="!store.accounts.data || store.accounts.data.length === 0 && !store.accounts.loading && store.vaults.data.length >= 1"
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
                         <p>{{ $t('no_found_accounts') }}</p>
-                        <buttonFl type="secondary" size="small" :hasIcon="false" label="Add account" />
+                        <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="secondary" size="small" :hasIcon="false" label="Add account" />
                     </div>
-                    <div v-else-if="!store.vaults.data || store.vaults.data.length === 0 && !store.vaults.loading" class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
+                    <div v-else-if="!store.vaults.data || store.vaults.data.length === 0 && !store.vaults.loading"
+                        class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
                         <p>Non ci sono vault in questo profilo</p>
                     </div>
-                    <cardAccount v-if="!store.accounts.loading" v-for="(account, accountIndex) in store.accounts.data"
-                        :key="accountIndex" :loading="false" :data="account" :index="accountIndex" />
+                    <cardAccount v-if="!store.accounts.loading"
+                        @contextmenu.prevent="showContextMenu($event, account, 'account')"
+                        v-for="(account, accountIndex) in store.accounts.data" :key="accountIndex" :loading="false"
+                        :data="account" :index="accountIndex" />
                     <cardAccount v-else-if="store.accounts.loading" v-for="(account, accIndex) in 8" :key="accIndex"
                         :loading="true" :data="account" :index="accIndex" />
                 </div>
@@ -48,11 +53,12 @@
         </div>
     </div>
 
-    <!-- MODAL -->
+    <!--  -->
     <Transition name="overlay-modal-fade">
-        <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open"
+        <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open || store.modals.createAccount.open || store.modals.editAccount.open || store.modals.deleteAccount.open"
             @click="closeModal" class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
     </Transition>
+    <!-- MODAL VAULT -->
     <Transition name="modal-fade">
         <modalCreate v-if="store.modals.createVault.open" title="Create a new vault">
             <template #inner>
@@ -99,21 +105,77 @@
         </modalDelete>
     </Transition>
 
+    <!-- MODAL ACCOUNT -->
+    <Transition name="modal-fade">
+        <modalCreate v-if="store.modals.createAccount.open" title="Add a new account">
+            <template #inner>
+                <form @submit.prevent class="w-full flex flex-col gap-[16px]">
+                    <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
+                        placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
+                    <div v-if="true" class="separator relative mt-6 flex gap-[12px] items-center justify-center">
+                        <div class="separator-start"></div>
+                        <span class="flex flex-none">Account section</span>
+                        <div class="separator-end"></div>
+                    </div>
+                    <buttonFl type="primary" size="default" :hasIcon="false" :loading="store.modals.editAccount.loading"
+                        label="Add account" class="w-full" />
+                </form>
+            </template>
+        </modalCreate>
+    </Transition>
+    <Transition name="modal-fade">
+        <modalCreate v-if="store.modals.editAccount.open" title="Edit account">
+            <template #inner>
+                <form @submit.prevent class="w-full flex flex-col gap-[16px]">
+                    <inputField v-model="store.modals.editAccount.data.name" type="text" forInput="name" label=""
+                        placeholder="Name" :required="true" :error="store.modals.editAccount.error.name" />
+                    <buttonFl type="primary" size="default" :hasIcon="false" :loading="store.modals.editAccount.loading"
+                        label="Save" class="w-full" />
+                </form>
+            </template>
+        </modalCreate>
+    </Transition>
+    <Transition name="modal-fade">
+        <modalDelete v-if="store.modals.deleteAccount.open" head="Are you sure?"
+            paragraph="Deleting your account is permanent and irreversible. You will lose all information in it.">
+            <template #footer>
+                <buttonFl @click="closeModal" type="outline" size="default" :hasIcon="false" :loading="false"
+                    label="Cancel" class="w-full" />
+                <buttonFl @click="deleteAccountFromVault" type="outline" size="default" :hasIcon="false"
+                    :loading="false" label="Delete account" class="w-full danger" />
+            </template>
+        </modalDelete>
+    </Transition>
+
     <!-- CONTEXT MENU -->
     <Transition name="contextmenu-fade">
         <contextMenu v-if="store.contextMenu.open"
             :style="{ top: `${store.contextMenu.y}px`, left: `${store.contextMenu.x}px` }">
             <template #inner>
 
-                <div @click="openModalEditVault"
-                    class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
-                    <Pencil size="20" />
-                    <span>Edit vault</span>
+                <div v-if="store.contextMenu.type === 'vault'">
+                    <div @click="openModalEditVault"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                        <Pencil size="20" />
+                        <span>Edit vault</span>
+                    </div>
+                    <div @click="openModalDeleteVault"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                        <Trash2 size="20" />
+                        <span>Delete vault</span>
+                    </div>
                 </div>
-                <div @click="openModalDeleteVault"
-                    class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
-                    <Trash2 size="20" />
-                    <span>Delete vault</span>
+                <div v-if="store.contextMenu.type === 'account'">
+                    <div @click="openModalEditAccount"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                        <Pencil size="20" />
+                        <span>Edit account</span>
+                    </div>
+                    <div @click="openModalDeleteAccount"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                        <Trash2 size="20" />
+                        <span>Delete account</span>
+                    </div>
                 </div>
 
             </template>
@@ -460,6 +522,48 @@ export default {
                 this.store.modals.deleteVault.loading = true;
             }
         },
+        async deleteAccountFromVault() {
+            this.store.modals.deleteAccount.loading = true;
+
+            const fieldData = this.store.modals.deleteAccount.data;
+
+            try {
+                const { data, error } = await supabase
+                    .from('vault_accounts')
+                    .delete()
+                    .eq('vault_id', fieldData.vault_id)
+                    .eq('account_id', fieldData.account_id)
+
+                if (!error) {
+                    // console.log(data);
+                    this.deleteAccount(fieldData);
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.deleteAccount.open = false;
+            }
+        },
+        async deleteAccount(fieldData) {
+            try {
+                const { data, error } = await supabase
+                    .from('accounts')
+                    .delete()
+                    .eq('id', fieldData.account_id)
+
+                if (!error) {
+                    //console.log(data);
+
+                    await this.getAccountsFromVault();
+                    this.closeContextMenu();
+                    this.store.modals.deleteAccount.open = false;
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.deleteAccount.open = false;
+            } finally {
+                this.store.modals.deleteAccount.loading = false;
+            }
+        },
 
         closeModal() {
             if (this.store.modals.createVault.open) {
@@ -473,9 +577,22 @@ export default {
             if (this.store.modals.deleteVault.open) {
                 this.store.modals.deleteVault.open = false;
             }
+
+            if (this.store.modals.createAccount.open) {
+                this.store.modals.createAccount.open = false;
+            }
+
+            if (this.store.modals.editAccount.open) {
+                this.store.modals.editAccount.open = false;
+            }
+
+            if (this.store.modals.deleteAccount.open) {
+                this.store.modals.deleteAccount.open = false;
+            }
         },
-        showContextMenu(event, data) {
+        showContextMenu(event, data, type) {
             event.preventDefault();
+            this.store.contextMenu.type = type;
             this.store.contextMenu.open = true;
             this.store.contextMenu.x = event.clientX;
             this.store.contextMenu.y = event.clientY;
@@ -501,6 +618,30 @@ export default {
             this.store.modals.deleteVault.open = !this.store.modals.deleteVault.open;
 
             this.store.modals.deleteVault.data = this.store.contextMenu.data;
+
+            this.store.contextMenu.open = false;
+            this.store.contextMenu.x = 0;
+            this.store.contextMenu.y = 0;
+        },
+        openModalEditAccount() {
+            this.store.modals.editAccount.open = !this.store.modals.editAccount.open;
+
+            this.store.modals.editAccount.data.id = this.store.contextMenu?.data?.accounts.id;
+            this.store.modals.editAccount.data.name = this.store.contextMenu?.data?.accounts.name;
+            this.store.modals.editAccount.data.username = this.store.contextMenu?.data?.accounts.username;
+            this.store.modals.editAccount.data.email = this.store.contextMenu?.data?.accounts.email;
+            this.store.modals.editAccount.data.password = this.store.contextMenu?.data?.accounts.password;
+            this.store.modals.editAccount.data.description = this.store.contextMenu?.data?.accounts.description;
+            this.store.modals.editAccount.data.website_url = this.store.contextMenu?.data?.accounts.website_url;
+
+            this.store.contextMenu.open = false;
+            this.store.contextMenu.x = 0;
+            this.store.contextMenu.y = 0;
+        },
+        openModalDeleteAccount() {
+            this.store.modals.deleteAccount.open = !this.store.modals.deleteAccount.open;
+
+            this.store.modals.deleteAccount.data = this.store.contextMenu.data;
 
             this.store.contextMenu.open = false;
             this.store.contextMenu.x = 0;

@@ -12,7 +12,7 @@
         </div>
         <div class="flex items-center justify-center"></div>
         <div class="flex gap-[10px] items-center justify-end">
-            <buttonFl type="secondary" size="small" :hasIcon="false" label="Add account" />
+            <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="secondary" size="small" :hasIcon="false" label="Add account" />
             <avatar size="small" :hasInputFile="false" :hasProfileMenu="true" />
         </div>
     </div>
@@ -20,6 +20,7 @@
 
 <script>
 import { auth } from '../../data/auth';
+import { store } from '../../data/store';
 
 import avatar from '../avatar/avatar.vue';
 import buttonFl from '../button/button-fl.vue';
@@ -32,7 +33,8 @@ export default {
     },
     data() {
         return {
-            auth
+            auth,
+            store
         }
     }
 }
