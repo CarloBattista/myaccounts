@@ -62,6 +62,7 @@ export const store = reactive({
                 website_url: null
             },
             error: {
+                vault_id: "errore",
                 name: null,
                 username: null,
                 email: null,

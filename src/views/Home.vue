@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <!--  -->
+    <!-- OVERLAY -->
     <Transition name="overlay-modal-fade">
         <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open || store.modals.createAccount.open || store.modals.editAccount.open || store.modals.deleteAccount.open"
             @click="closeModal" class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
@@ -114,7 +114,7 @@
                     <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
                     <dropdown label="Select the vault where you want to place the account"
-                        :selected="store.modals.createAccount.data.vault_name_selected">
+                        :selected="store.modals.createAccount.data.vault_name_selected" :error="store.modals.createAccount.error.vault_id">
                         <template #inner>
                             <div @click="selectVaultForCreateAccount(vault)"
                                 v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex"
@@ -607,6 +607,10 @@ export default {
         async createAccount() {
             this.store.modals.createAccount.loading = true;
 
+            if (!this.store.modals.createAccount.data.vault_id) {
+                return this.store.modals.createAccount.loading = false;
+            }
+
             const fieldData = this.store.modals.createAccount.data;
 
             try {
@@ -913,18 +917,22 @@ export default {
             immediate: true,
             deep: true
         },
-        'store.modals.createAccount': {
+        'store.modals.createAccount.data.vault_id': {
             handler(value) {
-                if (!value.data.vault_id) {
+                if (!value) {
                     this.setVaultOnDropdown();
-                }
-
-                if (!value.open) {
-                    value.data.vault_id = null;
                 }
             },
             deep: true
         },
+        'store.modals.createAccount.open': {
+            handler(value) {
+                if (!value) {
+                    this.store.modals.createAccount.data.vault_id = null;
+                }
+            },
+            deep: true
+        }
     }
 }
 </script>
