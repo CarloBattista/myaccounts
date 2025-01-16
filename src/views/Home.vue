@@ -31,11 +31,13 @@
                     </div>
                 </div>
                 <div class="w-full flex flex-col gap-[8px]">
-                    <div v-if="!store.accounts.data || store.accounts.data.length === 0 && !store.accounts.loading"
+                    <div v-if="!store.accounts.data || store.accounts.data.length === 0 && !store.accounts.loading && store.vaults.data.length >= 1"
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
-                        <p v-if="false">There are no accounts in this vault</p>
                         <p>{{ $t('no_found_accounts') }}</p>
                         <buttonFl type="secondary" size="small" :hasIcon="false" label="Add account" />
+                    </div>
+                    <div v-else-if="!store.vaults.data || store.vaults.data.length === 0 && !store.vaults.loading" class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
+                        <p>Non ci sono vault in questo profilo</p>
                     </div>
                     <cardAccount v-if="!store.accounts.loading" v-for="(account, accountIndex) in store.accounts.data"
                         :key="accountIndex" :loading="false" :data="account" :index="accountIndex" />
@@ -48,8 +50,8 @@
 
     <!-- MODAL -->
     <Transition name="overlay-modal-fade">
-        <div v-if="store.modals.createVault.open || store.modals.editVault.open" @click="closeModal"
-            class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
+        <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open"
+            @click="closeModal" class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
     </Transition>
     <Transition name="modal-fade">
         <modalCreate v-if="store.modals.createVault.open" title="Create a new vault">
@@ -85,6 +87,17 @@
             </template>
         </modalCreate>
     </Transition>
+    <Transition name="modal-fade">
+        <modalDelete v-if="store.modals.deleteVault.open" head="Are you sure?"
+            paragraph="Deleting the vault is permanent and irreversible. You will lose all accounts within it.">
+            <template #footer>
+                <buttonFl @click="closeModal" type="outline" size="default" :hasIcon="false" :loading="false"
+                    label="Cancel" class="w-full" />
+                <buttonFl @click="deleteVaultFromProfile" type="outline" size="default" :hasIcon="false"
+                    :loading="false" label="Delete vault" class="w-full danger" />
+            </template>
+        </modalDelete>
+    </Transition>
 
     <!-- CONTEXT MENU -->
     <Transition name="contextmenu-fade">
@@ -118,6 +131,7 @@ import navItem from '../components/nav/nav-item.vue';
 import cardAccount from '../components/card/card-account.vue';
 import buttonFl from '../components/button/button-fl.vue';
 import modalCreate from '../components/modal/modal-create.vue';
+import modalDelete from '../components/modal/modal-delete.vue';
 import inputField from '../components/input/input-field.vue';
 import contextMenu from '../components/menu/context-menu.vue';
 
@@ -132,6 +146,7 @@ export default {
         cardAccount,
         buttonFl,
         modalCreate,
+        modalDelete,
         inputField,
         contextMenu,
 
@@ -366,6 +381,49 @@ export default {
                 this.store.modals.editVault.loading = false;
             }
         },
+        async deleteVaultFromProfile() {
+            this.store.modals.deleteVault.loading = true;
+
+            const fieldData = this.store.modals.deleteVault.data;
+
+            try {
+                const { data, error } = await supabase
+                    .from('profile_vaults')
+                    .delete()
+                    .eq('profile_id', this.auth.PROFILE_AUTH_ID)
+                    .eq('vault_id', fieldData.vault_id)
+
+                if (!error) {
+                    // console.log(data);
+
+                    this.deleteVault(fieldData);
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.editVault.open = false;
+            }
+        },
+        async deleteVault(fieldData) {
+            try {
+                const { data, error } = await supabase
+                    .from('vaults')
+                    .delete()
+                    .eq('id', fieldData.vault_id)
+
+                if (!error) {
+                    // console.log(data);
+
+                    await this.getVaults();
+                    this.closeContextMenu();
+                    this.store.modals.deleteVault.open = false;
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.editVault.open = false;
+            } finally {
+                this.store.modals.deleteVault.loading = true;
+            }
+        },
 
         closeModal() {
             if (this.store.modals.createVault.open) {
@@ -374,6 +432,10 @@ export default {
 
             if (this.store.modals.editVault.open) {
                 this.store.modals.editVault.open = false;
+            }
+
+            if (this.store.modals.deleteVault.open) {
+                this.store.modals.deleteVault.open = false;
             }
         },
         showContextMenu(event, data) {
@@ -394,6 +456,15 @@ export default {
 
             this.store.modals.editVault.data.name = this.store.contextMenu?.data?.vaults.name;
             this.store.modals.editVault.data.id = this.store.contextMenu?.data?.vaults.id;
+
+            this.store.contextMenu.open = false;
+            this.store.contextMenu.x = 0;
+            this.store.contextMenu.y = 0;
+        },
+        openModalDeleteVault() {
+            this.store.modals.deleteVault.open = !this.store.modals.deleteVault.open;
+
+            this.store.modals.deleteVault.data = this.store.contextMenu.data;
 
             this.store.contextMenu.open = false;
             this.store.contextMenu.x = 0;

@@ -39,7 +39,13 @@ export const store = reactive({
                 name: null,
             },
             loading: false
-        }
+        },
+        deleteVault: {
+            open: false,
+            data: {},
+            error: null,
+            loading: false
+        },
     },
 
     contextMenu: {

@@ -93,4 +93,13 @@ export default {
     background-color: rgba(255, 255, 255, .05);
     color: #fff;
 }
+
+/* Danger */
+.btn-fl.danger {
+    color: #F34822;
+}
+
+.btn-fl:hover.danger {
+    color: #F34822;
+}
 </style>
