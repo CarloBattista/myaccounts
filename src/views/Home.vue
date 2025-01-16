@@ -114,7 +114,8 @@
                     <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
                     <dropdown label="Select the vault where you want to place the account"
-                        :selected="store.modals.createAccount.data.vault_name_selected" :error="store.modals.createAccount.error.vault_id">
+                        :selected="store.modals.createAccount.data.vault_name_selected"
+                        :error="store.modals.createAccount.error.vault_id">
                         <template #inner>
                             <div @click="selectVaultForCreateAccount(vault)"
                                 v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex"
@@ -176,6 +177,42 @@
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.editAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.editAccount.error.name" />
+                    <div class="separator relative mt-6 flex gap-[12px] items-center justify-center">
+                        <div class="separator-start"></div>
+                        <span class="flex flex-none">Account section</span>
+                        <div class="separator-end"></div>
+                    </div>
+                    <div v-if="store.modals.editAccount.fields.username" class="flex gap-[12px] items-center">
+                        <inputField v-model="store.modals.editAccount.data.username" type="text" forInput="username"
+                            label="" placeholder="Username" :required="true"
+                            :error="store.modals.editAccount.error.username" class="w-full" />
+                        <div @click="store.modals.editAccount.fields.username = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.editAccount.fields.email" class="flex gap-[12px] items-center">
+                        <inputField v-model="store.modals.editAccount.data.email" type="email" forInput="email" label=""
+                            placeholder="Email" :required="true" :error="store.modals.editAccount.error.email"
+                            class="w-full" />
+                        <div @click="store.modals.editAccount.fields.email = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.editAccount.fields.password" class="flex gap-[12px] items-center">
+                        <inputField v-model="store.modals.editAccount.data.password" type="password" forInput="password"
+                            label="" placeholder="Password" :required="true"
+                            :error="store.modals.editAccount.error.password" class="w-full" />
+                        <div @click="store.modals.editAccount.fields.password = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div @contextmenu.prevent="showContextMenu($event, null, 'edit-account-add-element')"
+                        class="w-full h-[48px] px-[16px] py-[12px] rounded-[16px] border border-dashed text-base font-medium text-[#989898] border-[#7C7C7C] bg-[#2E2E2E] hover:bg-white/15 hover:border-white cursor-pointer transition-all duration-150">
+                        <span>Add element</span>
+                    </div>
                     <buttonFl @click="editAccount" type="primary" size="default" :hasIcon="false"
                         :loading="store.modals.editAccount.loading" label="Save" class="w-full" />
                 </form>
@@ -195,7 +232,7 @@
     </Transition>
 
     <!-- CONTEXT MENU -->
-    <Transition name="contextmenu-fade">
+    <Transition name="contextmenu-fade" class="whitespace-nowrap">
         <contextMenu v-if="store.contextMenu.open"
             :style="{ top: `${store.contextMenu.y}px`, left: `${store.contextMenu.x}px` }">
             <template #inner>
@@ -250,6 +287,36 @@
                         class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
                         :class="{ 'bg-white/20': store.modals.createAccount.fields.description }">
                         <Plus v-if="!store.modals.createAccount.fields.description" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Description</span>
+                    </div>
+                </div>
+                <div v-if="store.contextMenu.type === 'edit-account-add-element'">
+                    <div @click="store.modals.editAccount.fields.username = !store.modals.editAccount.fields.username"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.editAccount.fields.username }">
+                        <Plus v-if="!store.modals.editAccount.fields.username" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Username</span>
+                    </div>
+                    <div @click="store.modals.editAccount.fields.email = !store.modals.editAccount.fields.email"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.editAccount.fields.email }">
+                        <Plus v-if="!store.modals.editAccount.fields.email" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Email</span>
+                    </div>
+                    <div @click="store.modals.editAccount.fields.password = !store.modals.editAccount.fields.password"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.editAccount.fields.password }">
+                        <Plus v-if="!store.modals.editAccount.fields.password" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Password</span>
+                    </div>
+                    <div @click="store.modals.editAccount.fields.description = !store.modals.editAccount.fields.description"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.editAccount.fields.description }">
+                        <Plus v-if="!store.modals.editAccount.fields.description" size="20" />
                         <Minus v-else size="20" />
                         <span>Description</span>
                     </div>
@@ -618,12 +685,12 @@ export default {
                     .from('accounts')
                     .insert({
                         account_image: fieldData?.account_image,
-                        name: fieldData.name,
-                        username: fieldData.username,
-                        email: fieldData.email,
-                        password: fieldData.password,
-                        description: fieldData.description,
-                        website_url: fieldData.website_url,
+                        name: fieldData?.name,
+                        username: fieldData?.username,
+                        email: fieldData?.email,
+                        password: fieldData?.password,
+                        description: fieldData?.description,
+                        website_url: fieldData?.website_url,
                     })
                     .select('id')
 
@@ -652,11 +719,45 @@ export default {
                     await this.getAccountsFromVault();
 
                     this.store.modals.createAccount.open = false;
+                    this.store.modals.createAccount.error.vault_id = null;
                 }
             } catch (e) {
                 console.error(e);
             } finally {
                 this.store.modals.createAccount.loading = false;
+            }
+        },
+        async editAccount() {
+            this.store.modals.editAccount.loading = true;
+
+            const fieldData = this.store.modals.editAccount.data;
+
+            try {
+                const { data, error } = await supabase
+                    .from('accounts')
+                    .update({
+                        account_image: fieldData?.account_image,
+                        name: fieldData?.name,
+                        username: fieldData?.username,
+                        email: fieldData?.email,
+                        password: fieldData?.password,
+                        description: fieldData?.description,
+                        website_url: fieldData?.website_url,
+                    })
+                    .eq('id', fieldData.id)
+
+                if (!error) {
+                    // console.log(data)
+
+                    await this.getAccountsFromVault();
+                    this.closeContextMenu();
+                    this.store.modals.editAccount.open = false;
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.editAccount.open = false;
+            } finally {
+                this.store.modals.editAccount.loading = false;
             }
         },
         async deleteAccountFromVault() {
@@ -835,7 +936,7 @@ export default {
             this.store.contextMenu.open = false;
             this.store.contextMenu.x = 0;
             this.store.contextMenu.y = 0;
-        }
+        },
     },
     watch: {
         'auth.profile': {
@@ -932,7 +1033,35 @@ export default {
                 }
             },
             deep: true
-        }
+        },
+        'store.modals.editAccount': {
+            handler(value) {
+                if (value.open && value.data.username) {
+                    value.fields.username = true;
+                } else {
+                    value.fields.username = false;
+                }
+
+                if (value.open && value.data.email) {
+                    value.fields.email = true;
+                } else {
+                    value.fields.email = false;
+                }
+
+                if (value.open && value.data.password) {
+                    value.fields.password = true;
+                } else {
+                    value.fields.password = false;
+                }
+
+                if (value.open && value.data.description) {
+                    value.fields.description = true;
+                } else {
+                    value.fields.description = false;
+                }
+            },
+            deep: true
+        },
     }
 }
 </script>

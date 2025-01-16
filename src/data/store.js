@@ -62,7 +62,7 @@ export const store = reactive({
                 website_url: null
             },
             error: {
-                vault_id: "errore",
+                vault_id: null,
                 name: null,
                 username: null,
                 email: null,
@@ -71,9 +71,9 @@ export const store = reactive({
                 website_url: null
             },
             fields: {
-                name: false,
-                username: true,
-                email: false,
+                name: true,
+                username: false,
+                email: true,
                 password: false,
                 description: false,
                 website_url: false
@@ -98,6 +98,14 @@ export const store = reactive({
                 password: null,
                 description: null,
                 website_url: null
+            },
+            fields: {
+                name: false,
+                username: false,
+                email: false,
+                password: false,
+                description: false,
+                website_url: false
             },
             loading: false
         },
