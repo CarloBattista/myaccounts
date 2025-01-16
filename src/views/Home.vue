@@ -387,16 +387,52 @@ export default {
             const fieldData = this.store.modals.deleteVault.data;
 
             try {
-                const { data, error } = await supabase
+                // Prima otteniamo tutti gli account_id associati al vault
+                const { data: accountsData, error: fetchError } = await supabase
+                    .from('vault_accounts')
+                    .select('account_id')
+                    .eq('vault_id', fieldData.vault_id);
+
+                if (fetchError) {
+                    console.error('Errore durante il recupero degli account:', fetchError);
+                    return;
+                }
+
+                // Eliminiamo le associazioni dalla tabella vault_accounts
+                const { error: vaultAccountsError } = await supabase
+                    .from('vault_accounts')
+                    .delete()
+                    .eq('vault_id', fieldData.vault_id);
+
+                if (vaultAccountsError) {
+                    console.error('Errore durante l\'eliminazione delle associazioni account:', vaultAccountsError);
+                    return;
+                }
+
+                // Eliminiamo gli account dalla tabella accounts
+                if (accountsData && accountsData.length > 0) {
+                    const accountIds = accountsData.map(acc => acc.account_id);
+                    const { error: accountsError } = await supabase
+                        .from('accounts')
+                        .delete()
+                        .in('id', accountIds);
+
+                    if (accountsError) {
+                        console.error('Errore durante l\'eliminazione degli account:', accountsError);
+                        return;
+                    }
+                }
+
+                // Poi eliminiamo l'associazione tra profilo e vault
+                const { error: profileVaultError } = await supabase
                     .from('profile_vaults')
                     .delete()
                     .eq('profile_id', this.auth.PROFILE_AUTH_ID)
-                    .eq('vault_id', fieldData.vault_id)
+                    .eq('vault_id', fieldData.vault_id);
 
-                if (!error) {
-                    // console.log(data);
-
+                if (!profileVaultError) {
                     this.deleteVault(fieldData);
+                    await this.getVaults();
                 }
             } catch (e) {
                 console.error(e);
