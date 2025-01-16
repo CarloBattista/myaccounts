@@ -7,7 +7,7 @@
         </div>
         <Transition name="fade">
             <div v-if="hasProfileMenu && profileMenuIsOpen"
-                class="profileMenu-container absolute z-[999] top-[calc(100%+20px)] right-0 w-[240px] min-h-[200px] rounded-[20px] shadow">
+                class="profileMenu-container absolute z-[999] top-[calc(100%+20px)] right-0 w-[240px] min-h-[200px] rounded-[20px] shadow-lg">
                 <section class="w-full p-[8px]">
                     <div class="w-full pt-[8px] px-[10px] flex flex-col gap-[10px]">
                         <div class="flex flex-col">

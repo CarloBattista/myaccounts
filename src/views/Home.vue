@@ -36,7 +36,8 @@
                     <div v-if="!store.accounts.data || store.accounts.data.length === 0 && !store.accounts.loading && store.vaults.data.length >= 1"
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
                         <p>{{ $t('no_found_accounts') }}</p>
-                        <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="secondary" size="small" :hasIcon="false" label="Add account" />
+                        <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open"
+                            type="secondary" size="small" :hasIcon="false" label="Add account" />
                     </div>
                     <div v-else-if="!store.vaults.data || store.vaults.data.length === 0 && !store.vaults.loading"
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
@@ -112,13 +113,59 @@
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
-                    <div v-if="true" class="separator relative mt-6 flex gap-[12px] items-center justify-center">
+                    <dropdown label="Select the vault where you want to place the account"
+                        :selected="store.modals.createAccount.data.vault_name_selected">
+                        <template #inner>
+                            <div @click="selectVaultForCreateAccount(vault)"
+                                v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex"
+                                class="w-full h-[36px] rounded-[10px] flex items-center bg-transparent hover:bg-white/10 cursor-pointer"
+                                :class="{ 'bg-white/20': vault.vault_id === store.modals.createAccount.data.vault_id }">
+                                <div class="h-full aspect-square flex items-center justify-center">
+                                    <Check v-if="vault.vault_id === store.modals.createAccount.data.vault_id"
+                                        size="20" />
+                                </div>
+                                <span>{{ vault.vaults?.name }}</span>
+                            </div>
+                        </template>
+                    </dropdown>
+                    <div class="separator relative mt-6 flex gap-[12px] items-center justify-center">
                         <div class="separator-start"></div>
                         <span class="flex flex-none">Account section</span>
                         <div class="separator-end"></div>
                     </div>
-                    <buttonFl type="primary" size="default" :hasIcon="false" :loading="store.modals.editAccount.loading"
-                        label="Add account" class="w-full" />
+                    <div v-if="store.modals.createAccount.fields.username" class="flex gap-[12px] items-center">
+                        <inputField v-model="store.modals.createAccount.data.username" type="text" forInput="username"
+                            label="" placeholder="Username" :required="true"
+                            :error="store.modals.createAccount.error.username" class="w-full" />
+                        <div @click="store.modals.createAccount.fields.username = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.createAccount.fields.email" class="flex gap-[12px] items-center">
+                        <inputField v-model="store.modals.createAccount.data.email" type="email" forInput="email"
+                            label="" placeholder="Email" :required="true"
+                            :error="store.modals.createAccount.error.email" class="w-full" />
+                        <div @click="store.modals.createAccount.fields.email = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.createAccount.fields.password" class="flex gap-[12px] items-center">
+                        <inputField v-model="store.modals.createAccount.data.password" type="password"
+                            forInput="password" label="" placeholder="Password" :required="true"
+                            :error="store.modals.createAccount.error.password" class="w-full" />
+                        <div @click="store.modals.createAccount.fields.password = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div @contextmenu.prevent="showContextMenu($event, null, 'create-account-add-element')"
+                        class="w-full h-[48px] px-[16px] py-[12px] rounded-[16px] border border-dashed text-base font-medium text-[#989898] border-[#7C7C7C] bg-[#2E2E2E] hover:bg-white/15 hover:border-white cursor-pointer transition-all duration-150">
+                        <span>Add element</span>
+                    </div>
+                    <buttonFl @click="createAccount" type="primary" size="default" :hasIcon="false"
+                        :loading="store.modals.createAccount.loading" label="Add" class="w-full" />
                 </form>
             </template>
         </modalCreate>
@@ -129,8 +176,8 @@
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.editAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.editAccount.error.name" />
-                    <buttonFl type="primary" size="default" :hasIcon="false" :loading="store.modals.editAccount.loading"
-                        label="Save" class="w-full" />
+                    <buttonFl @click="editAccount" type="primary" size="default" :hasIcon="false"
+                        :loading="store.modals.editAccount.loading" label="Save" class="w-full" />
                 </form>
             </template>
         </modalCreate>
@@ -177,6 +224,36 @@
                         <span>Delete account</span>
                     </div>
                 </div>
+                <div v-if="store.contextMenu.type === 'create-account-add-element'">
+                    <div @click="store.modals.createAccount.fields.username = !store.modals.createAccount.fields.username"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.createAccount.fields.username }">
+                        <Plus v-if="!store.modals.createAccount.fields.username" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Username</span>
+                    </div>
+                    <div @click="store.modals.createAccount.fields.email = !store.modals.createAccount.fields.email"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.createAccount.fields.email }">
+                        <Plus v-if="!store.modals.createAccount.fields.email" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Email</span>
+                    </div>
+                    <div @click="store.modals.createAccount.fields.password = !store.modals.createAccount.fields.password"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.createAccount.fields.password }">
+                        <Plus v-if="!store.modals.createAccount.fields.password" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Password</span>
+                    </div>
+                    <div @click="store.modals.createAccount.fields.description = !store.modals.createAccount.fields.description"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.createAccount.fields.description }">
+                        <Plus v-if="!store.modals.createAccount.fields.description" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Description</span>
+                    </div>
+                </div>
 
             </template>
         </contextMenu>
@@ -196,9 +273,10 @@ import modalCreate from '../components/modal/modal-create.vue';
 import modalDelete from '../components/modal/modal-delete.vue';
 import inputField from '../components/input/input-field.vue';
 import contextMenu from '../components/menu/context-menu.vue';
+import dropdown from '../components/dropdown/dropdown.vue';
 
 // ICONS
-import { Vault, Pencil, Trash2 } from 'lucide-vue-next';
+import { Vault, Pencil, Trash2, Plus, Minus, Check } from 'lucide-vue-next';
 
 export default {
     name: "Home",
@@ -211,11 +289,15 @@ export default {
         modalDelete,
         inputField,
         contextMenu,
+        dropdown,
 
         // ICONS
         Vault,
         Pencil,
-        Trash2
+        Trash2,
+        Plus,
+        Minus,
+        Check
     },
     data() {
         return {
@@ -272,7 +354,7 @@ export default {
             const vaultId = vault.vault_id;
 
             if (!vaultId) {
-                return false;
+                return this.store.selectedVault.loading = false;
             }
 
             if (!this.auth.user && !this.auth.profile) {
@@ -308,8 +390,8 @@ export default {
             const parsedValue = JSON.parse(selectedVaultId);
             const vaultId = parsedValue.vaults.id;
 
-            if (!parsedValue) {
-                return false;
+            if (!parsedValue && !vaultId) {
+                return this.store.selectedVault.loading = false;
             }
 
             try {
@@ -522,6 +604,57 @@ export default {
                 this.store.modals.deleteVault.loading = true;
             }
         },
+        async createAccount() {
+            this.store.modals.createAccount.loading = true;
+
+            const fieldData = this.store.modals.createAccount.data;
+
+            try {
+                const { data, error } = await supabase
+                    .from('accounts')
+                    .insert({
+                        account_image: fieldData?.account_image,
+                        name: fieldData.name,
+                        username: fieldData.username,
+                        email: fieldData.email,
+                        password: fieldData.password,
+                        description: fieldData.description,
+                        website_url: fieldData.website_url,
+                    })
+                    .select('id')
+
+                if (!error) {
+                    // console.log(data);
+                    const accountId = data[0].id;
+
+                    await this.addAccountToVault(accountId);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async addAccountToVault(accountId) {
+            const selected_vault = this.store.modals.createAccount.data.vault_id;
+
+            try {
+                const { data, error } = await supabase
+                    .from('vault_accounts')
+                    .insert({ vault_id: selected_vault, account_id: accountId })
+                    .single()
+
+                if (!error) {
+                    // console.log(data);
+
+                    await this.getAccountsFromVault();
+
+                    this.store.modals.createAccount.open = false;
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.store.modals.createAccount.loading = false;
+            }
+        },
         async deleteAccountFromVault() {
             this.store.modals.deleteAccount.loading = true;
 
@@ -562,6 +695,58 @@ export default {
                 this.store.modals.deleteAccount.open = false;
             } finally {
                 this.store.modals.deleteAccount.loading = false;
+            }
+        },
+        async selectVaultForCreateAccount(vault) {
+            const vaultId = vault.vault_id;
+
+            if (vaultId === this.store.modals.createAccount.data.vault_id) {
+                return false;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('profile_vaults')
+                    .select('profile_id, vault_id, vaults(name)')
+                    .eq('profile_id', this.auth.PROFILE_AUTH_ID)
+                    .eq('vault_id', vaultId)
+                    .single()
+
+                if (!error) {
+                    // console.log(data);
+
+                    this.store.modals.createAccount.data.vault_id = data.vault_id;
+                    this.store.modals.createAccount.data.vault_name_selected = data.vaults.name;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async setVaultOnDropdown() {
+            const selectedVaultId = localStorage.getItem('selected-vault');
+            const parsedValue = JSON.parse(selectedVaultId);
+            const vaultId = parsedValue.vaults.id;
+
+            if (!vaultId && !this.store.modals.createAccount.data.vault_id) {
+                return false;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('profile_vaults')
+                    .select('profile_id, vault_id, vaults(name)')
+                    .eq('profile_id', this.auth.PROFILE_AUTH_ID)
+                    .eq('vault_id', vaultId)
+                    .single()
+
+                if (!error) {
+                    // console.log(data);
+
+                    this.store.modals.createAccount.data.vault_id = data.vault_id;
+                    this.store.modals.createAccount.data.vault_name_selected = data.vaults.name;
+                }
+            } catch (e) {
+                console.error(e);
             }
         },
 
@@ -702,7 +887,44 @@ export default {
                 }
             },
             deep: true
-        }
+        },
+        'store.modals.createAccount': {
+            handler(value) {
+                if (!value.open) {
+                    value.data.name = null;
+                }
+
+                if (!value.fields.username) {
+                    value.data.username = null;
+                }
+
+                if (!value.fields.email) {
+                    value.data.email = null;
+                }
+
+                if (!value.fields.password) {
+                    value.data.password = null;
+                }
+
+                if (!value.fields.description) {
+                    value.data.description = null;
+                }
+            },
+            immediate: true,
+            deep: true
+        },
+        'store.modals.createAccount': {
+            handler(value) {
+                if (!value.data.vault_id) {
+                    this.setVaultOnDropdown();
+                }
+
+                if (!value.open) {
+                    value.data.vault_id = null;
+                }
+            },
+            deep: true
+        },
     }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div ref="contextMenu" class="contextMenu-container absolute z-[9999] min-w-[180px] rounded-[20px]">
+    <div ref="contextMenu" class="contextMenu-container absolute z-[999999] min-w-[180px] rounded-[20px]">
         <div class="w-full p-[8px] flex flex-col">
             <slot name="inner"></slot>
         </div>

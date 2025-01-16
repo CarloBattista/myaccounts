@@ -52,7 +52,8 @@ export const store = reactive({
         createAccount: {
             open: false,
             data: {
-                id: null,
+                vault_id: null,
+                vault_name_selected: null,
                 name: null,
                 username: null,
                 email: null,
@@ -67,6 +68,14 @@ export const store = reactive({
                 password: null,
                 description: null,
                 website_url: null
+            },
+            fields: {
+                name: false,
+                username: true,
+                email: false,
+                password: false,
+                description: false,
+                website_url: false
             },
             loading: false
         },
