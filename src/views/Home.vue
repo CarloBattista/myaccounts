@@ -21,8 +21,8 @@
                         class="w-[unset] flex gap-[24px] py-[4px] px-[20px] my-[-4px] mx-[calc(20px*-1)] overflow-x-auto scrollbar-none">
                         <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline"
                             size="small" :hasIcon="false" label="Create vault" class="w-fit" />
-                        <div @click="selectedVault(vault)" @contextmenu.prevent="showContextMenu($event, vault)" v-for="(vault, vaultIndex) in store.vaults.data"
-                            :key="vaultIndex"
+                        <div @click="selectedVault(vault)" @contextmenu.prevent="showContextMenu($event, vault)"
+                            v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex"
                             class="navItem flex gap-[8px] items-center text-base font-medium whitespace-nowrap cursor-pointer"
                             :class="{ 'selected-vault': store.selectedVault.data.vaults?.id === vault.vaults?.id }">
                             <Vault size="20px" />
@@ -79,8 +79,8 @@
                         <span class="flex flex-none">Account section</span>
                         <div class="separator-end"></div>
                     </div>
-                    <buttonFl @click="createVault" type="primary" size="default" :hasIcon="false"
-                        :loading="store.modals.editVault.loading" label="Create vault" class="w-full" />
+                    <buttonFl @click="editVault" type="primary" size="default" :hasIcon="false"
+                        :loading="store.modals.editVault.loading" label="Save" class="w-full" />
                 </form>
             </template>
         </modalCreate>
@@ -89,15 +89,16 @@
     <!-- CONTEXT MENU -->
     <Transition name="contextmenu-fade">
         <contextMenu v-if="store.contextMenu.open"
-            :style="{ top: `${store.contextMenu.y}px`, left: `${store.contextMenu.x}px` }"
-            :data="store.contextMenu.data">
+            :style="{ top: `${store.contextMenu.y}px`, left: `${store.contextMenu.x}px` }">
             <template #inner>
 
-                <div class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                <div @click="openModalEditVault"
+                    class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
                     <Pencil size="20" />
                     <span>Edit vault</span>
                 </div>
-                <div class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
+                <div @click="openModalDeleteVault"
+                    class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
                     <Trash2 size="20" />
                     <span>Delete vault</span>
                 </div>
@@ -305,6 +306,11 @@ export default {
                 this.store.modals.createVault.loading = false;
             }
 
+            if (!this.auth.PROFILE_AUTH_ID) {
+                this.store.modals.createVault.error.name = "General error.";
+                this.store.modals.createVault.loading = false;
+            }
+
             try {
                 const { data, error } = await supabase
                     .from('profile_vaults')
@@ -324,6 +330,42 @@ export default {
                 this.store.modals.createVault.loading = false;
             }
         },
+        async editVault() {
+            this.store.modals.editVault.loading = true;
+
+            if (!this.store.modals.editVault.data.name) {
+                this.store.modals.editVault.error.name = "The name is required.";
+                this.store.modals.editVault.loading = false;
+                return this.store.modals.editVault.loading = false;
+            }
+
+            if (this.store.modals.editVault.data.name === this.store.contextMenu.data.vaults.name) {
+                this.store.modals.editVault.loading = false;
+                return this.store.modals.editVault.loading = false;
+            }
+
+            const fieldData = this.store.modals.editVault.data;
+
+            try {
+                const { data, error } = await supabase
+                    .from('vaults')
+                    .update({ name: fieldData.name })
+                    .eq('id', fieldData.id)
+
+                if (!error) {
+                    // console.log(data)
+
+                    await this.getVaults();
+                    this.closeContextMenu();
+                    this.store.modals.editVault.open = false;
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.editVault.open = false;
+            } finally {
+                this.store.modals.editVault.loading = false;
+            }
+        },
 
         closeModal() {
             if (this.store.modals.createVault.open) {
@@ -334,12 +376,29 @@ export default {
                 this.store.modals.editVault.open = false;
             }
         },
-        showContextMenu(event) {
+        showContextMenu(event, data) {
             event.preventDefault();
             this.store.contextMenu.open = true;
             this.store.contextMenu.x = event.clientX;
             this.store.contextMenu.y = event.clientY;
+            this.store.contextMenu.data = data;
         },
+        closeContextMenu() {
+            this.store.contextMenu.open = false;
+            this.store.contextMenu.x = 0;
+            this.store.contextMenu.y = 0;
+            this.store.contextMenu.data = null;
+        },
+        openModalEditVault() {
+            this.store.modals.editVault.open = !this.store.modals.editVault.open;
+
+            this.store.modals.editVault.data.name = this.store.contextMenu?.data?.vaults.name;
+            this.store.modals.editVault.data.id = this.store.contextMenu?.data?.vaults.id;
+
+            this.store.contextMenu.open = false;
+            this.store.contextMenu.x = 0;
+            this.store.contextMenu.y = 0;
+        }
     },
     watch: {
         'auth.profile': {

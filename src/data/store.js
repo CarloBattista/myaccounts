@@ -32,6 +32,7 @@ export const store = reactive({
         editVault: {
             open: false,
             data: {
+                id: null,
                 name: null,
             },
             error: {
