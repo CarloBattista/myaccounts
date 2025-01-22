@@ -178,6 +178,17 @@
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.editAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.editAccount.error.name" />
+                    <dropdown label="Select the vault where you want to place the account" selected="" :error="null">
+                        <template #inner>
+                            <div @click="selectVaultForCreateAccount(vault)"
+                                v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex" class="w-full h-[36px] rounded-[10px] flex items-center bg-transparent hover:bg-white/10 cursor-pointer" :class="{ 'bg-white/20': vault.vault_id === store.selectedVault.vault_id }">
+                                <div class="h-full aspect-square flex items-center justify-center">
+                                    <Check v-if="vault.vault_id === store.selectedVault.vault_id" size="20" />
+                                </div>
+                                <span>{{ vault.vaults?.name }}</span>
+                            </div>
+                        </template>
+                    </dropdown>
                     <div class="separator relative mt-6 flex gap-[12px] items-center justify-center">
                         <div class="separator-start"></div>
                         <span class="flex flex-none">Account section</span>
@@ -856,7 +867,9 @@ export default {
             }
         },
         async getLogoWeb() {
-            const domain = this.store.modals.createAccount.data.name.toLowerCase();
+            return false;
+            const fieldData = this.store.modals.createAccount.data;
+            const domain = fieldData.name;
             const apiKey = import.meta.env.VITE_LOGO_DEV_API_KEY;
             const size = 256;
 
@@ -870,28 +883,21 @@ export default {
                 });
 
                 if (res.ok) {
+                    console.log(apiUrl);
                     const logoBlob = await res.blob();
                     const logo = URL.createObjectURL(logoBlob);
 
-                    this.store.modals.createAccount.data.account_image = logo;
+                    this.store.modals.account_image = logo;
                 } else {
                     console.warn(res);
-                    this.store.modals.createAccount.data.account_image = null;
+                    this.store.modals.account_image = null;
                 }
             } catch (e) {
                 console.error(e);
-                this.store.modals.createAccount.data.account_image = null;
+                this.store.modals.account_image = null;
             }
         },
 
-        initDebouncedLogoFetch() {
-            this.getLogoWeb = this.debounce(() => {
-                const domain = this.store.modals.createAccount.data.name;
-                if (domain) {
-                    this.fetchLogo(domain);
-                }
-            }, 500); // Ritardo di 500 ms
-        },
         closeModal() {
             if (this.store.modals.createVault.open) {
                 this.store.modals.createVault.open = false;
@@ -973,14 +979,6 @@ export default {
             this.store.contextMenu.open = false;
             this.store.contextMenu.x = 0;
             this.store.contextMenu.y = 0;
-        },
-
-        debounce(func, delay) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), delay);
-            };
         },
     },
     watch: {

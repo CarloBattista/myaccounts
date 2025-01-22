@@ -84,6 +84,8 @@ export const store = reactive({
         editAccount: {
             open: false,
             data: {
+                vault_id: null,
+                vault_name_selected: null,
                 id: null,
                 name: null,
                 username: null,
@@ -117,6 +119,8 @@ export const store = reactive({
             error: null,
             loading: false
         },
+
+        account_image: null
     },
 
     contextMenu: {
