@@ -120,6 +120,13 @@ export const store = reactive({
             loading: false
         },
 
+        selectedAccount: {
+            open: false,
+            data: {},
+            error: null,
+            loading: false
+        },
+
         account_image: null
     },
 
@@ -129,5 +136,14 @@ export const store = reactive({
         x: 0,
         y: 0,
         data: null
+    },
+
+    toast: {
+        open: false,
+        type: "success",
+        hasIcon: true,
+        message: null,
+        error: null,
+        loading: false
     }
 });

@@ -3,8 +3,9 @@
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
-                <buttonFl @click="store.modals.createVault.open = !store.modals.createVault.open" type="outline"
-                    size="small" :hasIcon="false" label="Create vault" class="w-fit" />
+                <buttonFl @click="openModalCreateVault" type="outline" size="small" :hasIcon="false"
+                    :disabled="!auth.profile?.is_subscribed && store.vaults.data.length >= 3" label="Create vault"
+                    class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
                     <navItem @click="selectedVault(vault)"
                         @contextmenu.prevent="showContextMenu($event, vault, 'vault')"
@@ -45,8 +46,8 @@
                     </div>
                     <cardAccount v-if="!store.accounts.loading"
                         @contextmenu.prevent="showContextMenu($event, account, 'account')"
-                        v-for="(account, accountIndex) in store.accounts.data" :key="accountIndex" :loading="false"
-                        :data="account" :index="accountIndex" />
+                        @dblclick="handleAccount(account)" v-for="(account, accountIndex) in store.accounts.data"
+                        :key="accountIndex" :loading="false" :data="account" :index="accountIndex" />
                     <cardAccount v-else-if="store.accounts.loading" v-for="(account, accIndex) in 8" :key="accIndex"
                         :loading="true" :data="account" :index="accIndex" />
                 </div>
@@ -56,7 +57,7 @@
 
     <!-- OVERLAY -->
     <Transition name="overlay-modal-fade">
-        <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open || store.modals.createAccount.open || store.modals.editAccount.open || store.modals.deleteAccount.open"
+        <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open || store.modals.selectedAccount.open || store.modals.createAccount.open || store.modals.editAccount.open || store.modals.deleteAccount.open"
             @click="closeModal" class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
     </Transition>
     <!-- MODAL VAULT -->
@@ -264,6 +265,40 @@
                     :loading="false" label="Delete account" class="w-full danger" />
             </template>
         </modalDelete>
+    </Transition>
+
+    <Transition name="modal-fade">
+        <modalCreate v-if="store.modals.selectedAccount.open" :title="store.modals.selectedAccount.data?.accounts.name"
+            :image="store.modals.selectedAccount.data?.accounts.account_image">
+            <template #inner>
+                <div class="w-full flex flex-col gap-[16px]">
+                    <div v-if="store.modals.selectedAccount.data?.accounts.username" tabindex="0"
+                        class="group relative h-[48px] px-[16px] py-[12px] rounded-[16px] outline outline-2 outline-transparent text-base font-medium text-white bg-[#2E2E2E] focus:bg-[#1E1E1E] hover:bg-[#2b2b2b] focus:outline-white cursor-pointer">
+                        <span>{{ store.modals.selectedAccount.data?.accounts.username }}</span>
+                        <div @click="handleCopy(store.modals.selectedAccount.data?.accounts.username)"
+                            class="absolute top-0 right-0 h-full px-[12px] flex items-center justify-center rounded-r-[16px] bg-[#2876FF]/10 hover:bg-[#2876FF]/20 opacity-0 group-hover:opacity-100 cursor-pointer">
+                            <span>Copia</span>
+                        </div>
+                    </div>
+                    <div v-if="store.modals.selectedAccount.data?.accounts.email" tabindex="0"
+                        class="group relative h-[48px] px-[16px] py-[12px] rounded-[16px] outline outline-2 outline-transparent text-base font-medium text-white bg-[#2E2E2E] focus:bg-[#1E1E1E] hover:bg-[#2b2b2b] focus:outline-white cursor-pointer">
+                        <span>{{ store.modals.selectedAccount.data?.accounts.email }}</span>
+                        <div @click="handleCopy(store.modals.selectedAccount.data?.accounts.email)"
+                            class="absolute top-0 right-0 h-full px-[12px] flex items-center justify-center rounded-r-[16px] bg-[#2876FF]/10 hover:bg-[#2876FF]/20 opacity-0 group-hover:opacity-100 cursor-pointer">
+                            <span>Copia</span>
+                        </div>
+                    </div>
+                    <div v-if="store.modals.selectedAccount.data?.accounts.password" tabindex="0"
+                        class="group relative h-[48px] px-[16px] py-[12px] rounded-[16px] outline outline-2 outline-transparent text-base font-medium text-white bg-[#2E2E2E] focus:bg-[#1E1E1E] hover:bg-[#2b2b2b] focus:outline-white cursor-pointer">
+                        <span>••••••••••••</span>
+                        <div @click="handleCopy(store.modals.selectedAccount.data?.accounts.password)"
+                            class="absolute top-0 right-0 h-full px-[12px] flex items-center justify-center rounded-r-[16px] bg-[#2876FF]/10 hover:bg-[#2876FF]/20 opacity-0 group-hover:opacity-100 cursor-pointer">
+                            <span>Copia</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </modalCreate>
     </Transition>
 
     <!-- CONTEXT MENU -->
@@ -534,6 +569,12 @@ export default {
         async createVault() {
             this.store.modals.createVault.loading = true;
 
+            if (!this.auth.profile?.is_subscribed && this.store.vaults.data.length >= 3) {
+                this.store.modals.createVault.error.name = "Non puoi creare più di 3 vaults senza un abbonamento.";
+                this.store.modals.createVault.loading = false;
+                return;
+            }
+
             if (!this.store.modals.createVault.data.name) {
                 this.store.modals.createVault.error.name = "The name is required.";
                 this.store.modals.createVault.loading = false;
@@ -572,6 +613,9 @@ export default {
                     if (newVault) {
                         this.selectedVault(newVault);
                     }
+
+                    this.store.toast.open = true;
+                    this.store.toast.message = "Vault creato correttamente!";
                 }
             } catch (e) {
                 console.error(e);
@@ -696,6 +740,9 @@ export default {
                     this.deleteVault(fieldData);
                     await this.getVaults();
                 }
+
+                this.store.toast.open = true;
+                this.store.toast.message = "Vault eliminato correttamente!";
             } catch (e) {
                 console.error(e);
                 this.store.modals.editVault.open = false;
@@ -750,6 +797,9 @@ export default {
                     const accountId = data[0].id;
 
                     await this.addAccountToVault(accountId);
+
+                    this.store.toast.open = true;
+                    this.store.toast.message = "Account aggiunto correttamente!";
                 }
             } catch (e) {
                 console.error(e);
@@ -807,6 +857,9 @@ export default {
                     await this.getAccountsFromVault();
                     this.closeContextMenu();
                     this.store.modals.editAccount.open = false;
+
+                    this.store.toast.open = true;
+                    this.store.toast.message = "Account modificato correttamente!";
                 }
             } catch (e) {
                 console.error(e);
@@ -830,6 +883,9 @@ export default {
                 if (!error) {
                     // console.log(data);
                     this.deleteAccount(fieldData);
+
+                    this.store.toast.open = true;
+                    this.store.toast.message = "Account eliminato correttamente!";
                 }
             } catch (e) {
                 console.error(e);
@@ -992,6 +1048,34 @@ export default {
                 }
             }, 500);
         },
+        async handleAccount(account) {
+            const vaultId = account.vault_id;
+            const accountId = account.account_id;
+
+            this.store.modals.selectedAccount.open = true;
+            this.store.modals.selectedAccount.loading = true;
+
+            try {
+                const { data, error } = await supabase
+                    .from('vault_accounts')
+                    .select('vault_id, account_id, accounts(*)')
+                    .eq('vault_id', vaultId)
+                    .eq('account_id', accountId)
+                    .single()
+
+                if (!error) {
+                    // console.log(data);
+
+                    this.store.modals.selectedAccount.data = data;
+                }
+            } catch (e) {
+                console.error(e);
+                this.store.modals.selectedAccount.loading = false;
+                this.store.modals.selectedAccount.open = false;
+            } finally {
+                this.store.modals.selectedAccount.loading = false;
+            }
+        },
 
         closeModal() {
             if (this.store.modals.createVault.open) {
@@ -1017,6 +1101,10 @@ export default {
             if (this.store.modals.deleteAccount.open) {
                 this.store.modals.deleteAccount.open = false;
             }
+
+            if (this.store.modals.selectedAccount.open) {
+                this.store.modals.selectedAccount.open = false;
+            }
         },
         showContextMenu(event, data, type) {
             event.preventDefault();
@@ -1031,6 +1119,13 @@ export default {
             this.store.contextMenu.x = 0;
             this.store.contextMenu.y = 0;
             this.store.contextMenu.data = null;
+        },
+        openModalCreateVault() {
+            this.store.modals.createVault.open = !this.store.modals.createVault.open;
+
+            if (!this.auth.profile?.is_subscribed && this.store.vaults.data.length >= 3) {
+                return this.store.modals.createVault.open = false;
+            }
         },
         openModalEditVault() {
             this.store.modals.editVault.open = !this.store.modals.editVault.open;
@@ -1098,6 +1193,14 @@ export default {
                 this.store.modals.editAccount.fields.description = false;
             }
         },
+        handleCopy(data) {
+            if (!data) {
+                return false;
+            }
+            navigator.clipboard.writeText(data).catch(err => {
+                console.error(err);
+            });
+        }
     },
     watch: {
         'auth.profile': {
@@ -1146,10 +1249,12 @@ export default {
                 const exist = value.find(vault => vault.vault_id === vaultId);
 
                 if (exist) {
-                    console.log("Ho trovato il vault selezionato.");
+                    // console.log("Ho trovato il vault selezionato.");
+                    return true;
                 } else {
-                    console.log("Vault selezionato non trovato, seleziono il primo disponibile.");
+                    // console.log("Vault selezionato non trovato, seleziono il primo disponibile.");
                     this.selectedVault(value[0]);
+                    return false;
                 }
             },
             deep: true

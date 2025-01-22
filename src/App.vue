@@ -1,7 +1,15 @@
 <template>
   <div>
     <RouterView />
-    <toast v-if="false" />
+    <Transition name="toast-fade">
+      <toast v-if="store.toast.open">
+        <template #icon>
+          <Check v-if="store.toast.type === 'success'" />
+          <ShieldAlert v-if="store.toast.type === 'alert'" />
+          <ShieldX v-if="store.toast.type === 'error'" />
+        </template>
+      </toast>
+    </Transition>
   </div>
 </template>
 
@@ -14,10 +22,18 @@ import i18n from "./lib/i18n";
 
 import toast from "./components/toast/toast.vue";
 
+// ICONS
+import { Check, ShieldAlert, ShieldX } from 'lucide-vue-next'
+
 export default {
   name: "App",
   components: {
-    toast
+    toast,
+
+    // ICONS
+    Check,
+    ShieldAlert,
+    ShieldX
   },
   data() {
     return {

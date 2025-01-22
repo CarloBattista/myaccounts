@@ -1,5 +1,5 @@
 <template>
-    <button class="btn-fl rounded-full flex items-center justify-center font-medium" :class="'color-'+type, 'size-'+size">
+    <button class="btn-fl rounded-full flex items-center justify-center font-medium" :class="'color-'+type, 'size-'+size" :disabled="disabled">
         <loader v-if="loading" />
         <div v-if="hasIcon && !loading">
             <slot name="icon"></slot>
@@ -20,6 +20,7 @@ export default {
         type: String,
         size: String,
         hasIcon: Boolean,
+        disabled: Boolean,
         label: String,
         loading: Boolean
     }
@@ -101,5 +102,11 @@ export default {
 
 .btn-fl:hover.danger {
     color: #F34822;
+}
+
+/* State */
+.btn-fl:disabled {
+    opacity: .5;
+    pointer-events: none;
 }
 </style>

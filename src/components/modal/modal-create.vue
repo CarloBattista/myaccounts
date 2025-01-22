@@ -5,7 +5,7 @@
             <div class="body w-full min-h-[100px] px-[32px] py-[24px] ">
                 <div class="w-full h-full sm:px-[32px] md:px-[44px] lg:px-[64px]">
                     <div class="w-full mb-[32px] flex flex-col gap-[32px] items-center text-white text-2xl font-semibold">
-                        <div class="h-[24px]">
+                        <div v-if="!image" class="h-[24px]">
                             <svg class="h-full w-auto" viewBox="0 0 43 25" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0.200195 0.399902H6.2002V24.3999H0.200195V0.399902Z" fill="white" />
@@ -14,6 +14,10 @@
                                 <path d="M42.2002 24.3999H36.2002V6.3999L39.2002 9.3999L42.2002 6.3999V24.3999Z"
                                     fill="white" />
                             </svg>
+                        </div>
+                        <div v-else class="relative h-[64px] aspect-square rounded-[16px] overflow-hidden">
+                            <img :src="image" alt="Account image" draggable="false" class="w-full h-full object-cover">
+                            <div class="absolute top-0 left-0 w-full h-full rounded-[16px] border border-solid border-white/10"></div>
                         </div>
                         <p v-if="title">{{ title }}</p>
                     </div>
@@ -29,7 +33,8 @@
 export default {
     name: "modal-create",
     props: {
-        title: String
+        title: String,
+        image: String
     }
 }
 </script>

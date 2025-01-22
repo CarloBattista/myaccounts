@@ -13,7 +13,7 @@
         <div class="flex items-center justify-center"></div>
         <div class="flex gap-[10px] items-center justify-end">
             <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="primary" size="small" :hasIcon="false" label="Add account" />
-            <buttonFl type="secondary" size="small" :hasIcon="false" label="Get Pro" />
+            <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" size="small" :hasIcon="false" label="Get Pro" />
             <avatar size="small" :hasInputFile="false" :hasProfileMenu="true" />
         </div>
     </div>
