@@ -111,9 +111,8 @@
         <modalCreate v-if="store.modals.createAccount.open" title="Add a new account">
             <template #inner>
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
-                    <inputField @input="getLogoWeb" v-model="store.modals.createAccount.data.name" type="text"
-                        forInput="name" label="" placeholder="Name" :required="true"
-                        :error="store.modals.createAccount.error.name" />
+                    <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
+                        placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
                     <dropdown label="Select the vault where you want to place the account"
                         :selected="store.modals.createAccount.data.vault_name_selected"
                         :error="store.modals.createAccount.error.vault_id">
@@ -158,6 +157,16 @@
                             forInput="password" label="" placeholder="Password" :required="true"
                             :error="store.modals.createAccount.error.password" class="w-full" />
                         <div @click="store.modals.createAccount.fields.password = false"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.createAccount.fields.website_url" class="flex gap-[12px] items-center">
+                        <inputField @input="websiteImage($event, store.modals.createAccount)"
+                            v-model="store.modals.createAccount.data.website_url" type="text" forInput="websiteUrl"
+                            label="" placeholder="Website" :required="true"
+                            :error="store.modals.createAccount.error.website_url" class="w-full" />
+                        <div @click="clearField('website_url')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
                         </div>
@@ -221,6 +230,16 @@
                             label="" placeholder="Password" :required="true"
                             :error="store.modals.editAccount.error.password" class="w-full" />
                         <div @click="clearField('password')"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.editAccount.fields.website_url" class="flex gap-[12px] items-center">
+                        <inputField @input="websiteImage($event, store.modals.editAccount)"
+                            v-model="store.modals.editAccount.data.website_url" type="text" forInput="websiteUrl"
+                            label="" placeholder="Website" :required="true"
+                            :error="store.modals.editAccount.error.website_url" class="w-full" />
+                        <div @click="clearField('website_url')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
                         </div>
@@ -306,6 +325,13 @@
                         <Minus v-else size="20" />
                         <span>Description</span>
                     </div>
+                    <div @click="store.modals.createAccount.fields.website_url = !store.modals.createAccount.fields.website_url"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.createAccount.fields.website_url }">
+                        <Plus v-if="!store.modals.createAccount.fields.website_url" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Website</span>
+                    </div>
                 </div>
                 <div v-if="store.contextMenu.type === 'edit-account-add-element'">
                     <div @click="store.modals.editAccount.fields.username = !store.modals.editAccount.fields.username"
@@ -336,6 +362,13 @@
                         <Minus v-else size="20" />
                         <span>Description</span>
                     </div>
+                    <div @click="store.modals.editAccount.fields.website_url = !store.modals.editAccount.fields.website_url"
+                        class="relative w-full h-[36px] px-[10px] rounded-[12px] whitespace-nowrap flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer"
+                        :class="{ 'bg-white/20': store.modals.editAccount.fields.website_url }">
+                        <Plus v-if="!store.modals.editAccount.fields.website_url" size="20" />
+                        <Minus v-else size="20" />
+                        <span>Website</span>
+                    </div>
                 </div>
 
             </template>
@@ -360,6 +393,7 @@ import dropdown from '../components/dropdown/dropdown.vue';
 
 // ICONS
 import { Vault, Pencil, Trash2, Plus, Minus, Check } from 'lucide-vue-next';
+import { data } from 'autoprefixer';
 
 export default {
     name: "Home",
@@ -385,7 +419,8 @@ export default {
     data() {
         return {
             store,
-            auth
+            auth,
+            debounceTimeout: null
         }
     },
     methods: {
@@ -700,7 +735,7 @@ export default {
                 const { data, error } = await supabase
                     .from('accounts')
                     .insert({
-                        account_image: fieldData?.account_image,
+                        account_image: this.store.modals?.account_image,
                         name: fieldData?.name,
                         username: fieldData?.username,
                         email: fieldData?.email,
@@ -752,7 +787,7 @@ export default {
                 const { data, error } = await supabase
                     .from('accounts')
                     .update({
-                        account_image: fieldData?.account_image,
+                        account_image: this.store.modals?.account_image,
                         name: fieldData?.name,
                         username: fieldData?.username,
                         email: fieldData?.email,
@@ -764,6 +799,10 @@ export default {
 
                 if (!error) {
                     // console.log(data)
+                    await supabase
+                        .from('vault_accounts')
+                        .update({ vault_id: fieldData.vault_id })
+                        .eq('account_id', fieldData.id);
 
                     await this.getAccountsFromVault();
                     this.closeContextMenu();
@@ -919,36 +958,39 @@ export default {
                 console.error(e);
             }
         },
-        async getLogoWeb() {
-            return false;
-            const fieldData = this.store.modals.createAccount.data;
-            const domain = fieldData.name;
-            const apiKey = import.meta.env.VITE_LOGO_DEV_API_KEY;
-            const size = 256;
+        async websiteImage(event, dataField) {
+            clearTimeout(this.debounceTimeout);
 
-            try {
-                const apiUrl = `https://img.logo.dev/${domain}.com?token=${apiKey}&size=${size}&retina=true`;
+            this.debounceTimeout = setTimeout(async () => {
+                const apiKey = import.meta.env.VITE_LOGO_DEV_API_KEY;
+                const size = 256;
 
-                const res = await fetch(apiUrl, {
-                    headers: {
-                        Authorization: `Bearer ${apiKey}`,
-                    },
-                });
+                const fieldWebsite = event.target.value;
+                const fieldFormatted = fieldWebsite.toLowerCase();
 
-                if (res.ok) {
-                    console.log(apiUrl);
-                    const logoBlob = await res.blob();
-                    const logo = URL.createObjectURL(logoBlob);
+                try {
+                    const apiUrl = `https://img.logo.dev/${fieldFormatted}?token=${apiKey}&size=${size}&retina=true`;
 
-                    this.store.modals.account_image = logo;
-                } else {
-                    console.warn(res);
+                    const res = await fetch(apiUrl, {
+                        headers: {
+                            Authorization: `Bearer ${apiKey}`,
+                        },
+                    });
+
+                    if (res.ok) {
+                        // console.log(res);
+                        const image = res.url;
+
+                        this.store.modals.account_image = image;
+                    } else {
+                        console.warn(res);
+                        this.store.modals.account_image = null;
+                    }
+                } catch (e) {
+                    console.error(e);
                     this.store.modals.account_image = null;
                 }
-            } catch (e) {
-                console.error(e);
-                this.store.modals.account_image = null;
-            }
+            }, 500);
         },
 
         closeModal() {
@@ -1055,7 +1097,7 @@ export default {
                 this.store.modals.editAccount.data.description = null;
                 this.store.modals.editAccount.fields.description = false;
             }
-        }
+        },
     },
     watch: {
         'auth.profile': {
@@ -1161,6 +1203,9 @@ export default {
 
                     this.store.modals.createAccount.data.description = null;
                     this.store.modals.createAccount.fields.description = false;
+
+                    this.store.modals.createAccount.data.website_url = null;
+                    this.store.modals.createAccount.fields.website_url = false;
                 }
             },
             immediate: true,
@@ -1181,6 +1226,9 @@ export default {
                     if (value.data.description !== null) {
                         value.fields.description = !!value.data.description;
                     }
+                    if (value.data.website_url !== null) {
+                        value.fields.website_url = !!value.data.website_url;
+                    }
                 } else {
                     value.data.username = null;
                     value.fields.username = false;
@@ -1193,13 +1241,12 @@ export default {
 
                     value.data.description = null;
                     value.fields.description = false;
+
+                    value.data.website_url = null;
+                    value.fields.website_url = false;
                 }
             },
             deep: true
-        },
-        'store.modals.createAccount.data.name': {
-            handler: "getLogoWeb",
-            immediate: true,
         },
     }
 }
