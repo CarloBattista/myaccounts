@@ -12,8 +12,10 @@
         </div>
         <div class="flex items-center justify-center"></div>
         <div class="flex gap-[10px] items-center justify-end">
-            <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="primary" size="small" :hasIcon="false" label="Add account" />
-            <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" size="small" :hasIcon="false" label="Get Pro" />
+            <buttonFl v-if="inHeroPlatform" @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="primary" size="small" :hasIcon="false" label="Add account" />
+            <RouterLink to="/pricing">
+                <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" size="small" :hasIcon="false" label="Get Pro" />
+            </RouterLink>
             <avatar size="small" :hasInputFile="false" :hasProfileMenu="true" />
         </div>
     </div>
@@ -31,6 +33,9 @@ export default {
     components: {
         avatar,
         buttonFl
+    },
+    props: {
+        inHeroPlatform: Boolean
     },
     data() {
         return {

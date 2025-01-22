@@ -5,8 +5,7 @@ import Login from '../views/onBoard/Login.vue';
 
 // General
 import Home from '../views/Home.vue';
-
-import Test from '../views/Test.vue';
+import Pricing from '../views/Pricing.vue';
 
 const routes = [
     // onBoard
@@ -26,13 +25,12 @@ const routes = [
         props: true,
         meta: { title: "MyAccounts • Home" }
     },
-
     {
-        path: '/test',
-        name: 'test',
-        component: Test,
+        path: '/pricing',
+        name: 'pricing',
+        component: Pricing,
         props: true,
-        meta: { title: "MyAccounts • Test" }
+        meta: { title: "MyAccounts • Pricing" }
     },
 ];
 

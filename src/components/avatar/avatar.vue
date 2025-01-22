@@ -17,8 +17,10 @@
                         </div>
                         <buttonFl type="tertiary" :disabled="false" :loading="false" label="Set up profile"
                             class="h-[36px] text-sm" />
-                        <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" :disabled="false" :loading="false" label="Get pro"
-                            class="h-[36px] text-sm" />
+                        <RouterLink to="/pricing">
+                            <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" :disabled="false"
+                                :loading="false" label="Get pro" class="w-full h-[36px] text-sm" />
+                        </RouterLink>
                     </div>
                 </section>
                 <div class="w-full h-[1px] mt-[8px] bg-white/10"></div>
