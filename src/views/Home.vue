@@ -178,12 +178,16 @@
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.editAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.editAccount.error.name" />
-                    <dropdown label="Select the vault where you want to place the account" selected="" :error="null">
+                    <dropdown label="Select the vault where you want to place the account"
+                        :selected="store.modals.editAccount.data.vault_name_selected"
+                        :error="store.modals.editAccount.error.vault_id">
                         <template #inner>
-                            <div @click="selectVaultForCreateAccount(vault)"
-                                v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex" class="w-full h-[36px] rounded-[10px] flex items-center bg-transparent hover:bg-white/10 cursor-pointer" :class="{ 'bg-white/20': vault.vault_id === store.selectedVault.vault_id }">
+                            <div @click="selectVaultForEditAccount(vault)"
+                                v-for="(vault, vaultIndex) in store.vaults.data" :key="vaultIndex"
+                                class="w-full h-[36px] rounded-[10px] flex items-center bg-transparent hover:bg-white/10 cursor-pointer"
+                                :class="{ 'bg-white/20': vault.vault_id === store.modals.editAccount.data.vault_id }">
                                 <div class="h-full aspect-square flex items-center justify-center">
-                                    <Check v-if="vault.vault_id === store.selectedVault.vault_id" size="20" />
+                                    <Check v-if="vault.vault_id === store.modals.editAccount.data.vault_id" size="20" />
                                 </div>
                                 <span>{{ vault.vaults?.name }}</span>
                             </div>
@@ -198,7 +202,7 @@
                         <inputField v-model="store.modals.editAccount.data.username" type="text" forInput="username"
                             label="" placeholder="Username" :required="true"
                             :error="store.modals.editAccount.error.username" class="w-full" />
-                        <div @click="store.modals.editAccount.fields.username = false"
+                        <div @click="clearField('username')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
                         </div>
@@ -207,7 +211,7 @@
                         <inputField v-model="store.modals.editAccount.data.email" type="email" forInput="email" label=""
                             placeholder="Email" :required="true" :error="store.modals.editAccount.error.email"
                             class="w-full" />
-                        <div @click="store.modals.editAccount.fields.email = false"
+                        <div @click="clearField('email')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
                         </div>
@@ -216,7 +220,7 @@
                         <inputField v-model="store.modals.editAccount.data.password" type="password" forInput="password"
                             label="" placeholder="Password" :required="true"
                             :error="store.modals.editAccount.error.password" class="w-full" />
-                        <div @click="store.modals.editAccount.fields.password = false"
+                        <div @click="clearField('password')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
                         </div>
@@ -839,6 +843,31 @@ export default {
                 console.error(e);
             }
         },
+        async selectVaultForEditAccount(vault) {
+            const vaultId = vault.vault_id;
+
+            if (vaultId === this.store.modals.editAccount.data.vault_id) {
+                return false;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('profile_vaults')
+                    .select('profile_id, vault_id, vaults(name)')
+                    .eq('profile_id', this.auth.PROFILE_AUTH_ID)
+                    .eq('vault_id', vaultId)
+                    .single()
+
+                if (!error) {
+                    // console.log(data);
+
+                    this.store.modals.editAccount.data.vault_id = data.vault_id;
+                    this.store.modals.editAccount.data.vault_name_selected = data.vaults.name;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
         async setVaultOnDropdown() {
             const selectedVaultId = localStorage.getItem('selected-vault');
             const parsedValue = JSON.parse(selectedVaultId);
@@ -861,6 +890,30 @@ export default {
 
                     this.store.modals.createAccount.data.vault_id = data.vault_id;
                     this.store.modals.createAccount.data.vault_name_selected = data.vaults.name;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async getVaultOfAccount() {
+            const accountId = this.store.modals.editAccount.data.id;
+
+            if (!accountId) {
+                return false;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('vault_accounts')
+                    .select('vault_id, account_id, vaults(name)')
+                    .eq('account_id', accountId)
+                    .single()
+
+                if (!error) {
+                    // console.log(data)
+
+                    this.store.modals.editAccount.data.vault_id = data.vault_id;
+                    this.store.modals.editAccount.data.vault_name_selected = data.vaults.name;
                 }
             } catch (e) {
                 console.error(e);
@@ -967,6 +1020,8 @@ export default {
             this.store.modals.editAccount.data.description = this.store.contextMenu?.data?.accounts.description;
             this.store.modals.editAccount.data.website_url = this.store.contextMenu?.data?.accounts.website_url;
 
+            this.getVaultOfAccount();
+
             this.store.contextMenu.open = false;
             this.store.contextMenu.x = 0;
             this.store.contextMenu.y = 0;
@@ -980,6 +1035,27 @@ export default {
             this.store.contextMenu.x = 0;
             this.store.contextMenu.y = 0;
         },
+        clearField(typeField) {
+            if (typeField === 'username') {
+                this.store.modals.editAccount.data.username = null;
+                this.store.modals.editAccount.fields.username = false;
+            }
+
+            if (typeField === 'email') {
+                this.store.modals.editAccount.data.email = null;
+                this.store.modals.editAccount.fields.email = false;
+            }
+
+            if (typeField === 'password') {
+                this.store.modals.editAccount.data.password = null;
+                this.store.modals.editAccount.fields.password = false;
+            }
+
+            if (typeField === 'description') {
+                this.store.modals.editAccount.data.description = null;
+                this.store.modals.editAccount.fields.description = false;
+            }
+        }
     },
     watch: {
         'auth.profile': {
@@ -1073,33 +1149,49 @@ export default {
             handler(value) {
                 if (!value) {
                     this.store.modals.createAccount.data.vault_id = null;
+
+                    this.store.modals.createAccount.data.username = null;
+                    this.store.modals.createAccount.fields.username = false;
+
+                    this.store.modals.createAccount.data.email = null;
+                    this.store.modals.createAccount.fields.email = false;
+
+                    this.store.modals.createAccount.data.password = null;
+                    this.store.modals.createAccount.fields.password = false;
+
+                    this.store.modals.createAccount.data.description = null;
+                    this.store.modals.createAccount.fields.description = false;
                 }
             },
+            immediate: true,
             deep: true
         },
         'store.modals.editAccount': {
             handler(value) {
-                if (value.open && value.data.username) {
-                    value.fields.username = true;
+                if (value.open) {
+                    if (value.data.username !== null) {
+                        value.fields.username = !!value.data.username;
+                    }
+                    if (value.data.email !== null) {
+                        value.fields.email = !!value.data.email;
+                    }
+                    if (value.data.password !== null) {
+                        value.fields.password = !!value.data.password;
+                    }
+                    if (value.data.description !== null) {
+                        value.fields.description = !!value.data.description;
+                    }
                 } else {
+                    value.data.username = null;
                     value.fields.username = false;
-                }
 
-                if (value.open && value.data.email) {
-                    value.fields.email = true;
-                } else {
+                    value.data.email = null;
                     value.fields.email = false;
-                }
 
-                if (value.open && value.data.password) {
-                    value.fields.password = true;
-                } else {
+                    value.data.password = null;
                     value.fields.password = false;
-                }
 
-                if (value.open && value.data.description) {
-                    value.fields.description = true;
-                } else {
+                    value.data.description = null;
                     value.fields.description = false;
                 }
             },
