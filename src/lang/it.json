@@ -1,3 +1,26 @@
 {
-  "no_found_accounts": "Non ci sono account in questa cassaforte"
+  "get_pro": "Diventa Pro",
+  "setup_profile": "Completa profilo",
+  "settings": "Impostazioni",
+  "logout": "Esci",
+  "no_found_accounts": "Non ci sono account in questa cassaforte",
+  "no_found_vaults_this_profile": "Non ci sono vault in questo profilo",
+  "head_create_new_vault": "Crea una nuova cassaforte",
+  "head_edit_vault": "Modifica cassaforte",
+  "create_vault": "Crea cassaforte",
+  "edit_vault": "Modifica cassaforte",
+  "delete_vault": "Elimina cassaforte",
+  "delete_vault_message_alert": "L'eliminazione della cassaforte è permanente e irreversibile. Perderai tutti gli account al suo interno.",
+  "head_create_new_account": "Aggiungi un nuovo account",
+  "add_account": "Aggiungi account",
+  "edit_account": "Modifica account",
+  "delete_account": "Elimina account",
+  "delete_account_message_alert": "L'eliminazione del account è permanente e irreversibile.",
+  "select_vault_where_you_want_place_account": "Seleziona la cassaforte in cui desideri collocare l'account",
+  "account_section": "Sezione account",
+  "add_element": "Aggiungi elemento",
+  "save": "Salva",
+  "add": "Aggiungi",
+  "cancel": "Cancella",
+  "you_sure": "Sei sicuro?"
 }

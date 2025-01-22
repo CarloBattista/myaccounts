@@ -15,39 +15,40 @@
                                 auth.profile?.last_name }}</h2>
                             <h3 class="text-[#989898] text-sm font-normal">{{ auth.user?.email }}</h3>
                         </div>
-                        <buttonFl type="tertiary" :disabled="false" :loading="false" label="Set up profile"
+                        <buttonFl type="tertiary" :disabled="false" :loading="false" :label="$t('setup_profile')"
                             class="h-[36px] text-sm" />
                         <RouterLink to="/pricing">
                             <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" :disabled="false"
-                                :loading="false" label="Get pro" class="w-full h-[36px] text-sm" />
+                                :loading="false" :label="$t('get_pro')" class="w-full h-[36px] text-sm" />
                         </RouterLink>
                     </div>
                 </section>
                 <div class="w-full h-[1px] mt-[8px] bg-white/10"></div>
                 <section class="w-full p-[8px]">
-                    <div
-                        class="w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center text-sm font-medium bg-transparent hover:bg-white/10 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                            class="text-[#989898] w-[20px] h-[20px]" data-sentry-element="svg"
-                            data-sentry-component="SettingsIcon" data-sentry-source-file="SettingsIcon.tsx">
-                            <title>settings icon</title>
-                            <path
-                                d="M10.001 1L10 5M10.001 19V15M19 10.0015H15M1 10.0015H5M16.3652 3.63772L13.5029 6.5M3.63772 16.3652L6.50294 13.5M16.3652 16.3652L13.5 13.5M3.63772 3.63772L6.5 6.5"
-                                stroke="currentColor" stroke-width="2" stroke-miterlimit="10"
-                                vector-effect="non-scaling-stroke" data-sentry-element="path"
-                                data-sentry-source-file="SettingsIcon.tsx"></path>
-                            <circle cx="10" cy="10" r="5" stroke="currentColor" stroke-width="2"
-                                vector-effect="non-scaling-stroke" data-sentry-element="circle"
-                                data-sentry-source-file="SettingsIcon.tsx"></circle>
-                        </svg>
-                        <span>Settings</span>
-                    </div>
+                    <RouterLink to="/settings">
+                        <div class="w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center text-sm font-medium bg-transparent hover:bg-white/10 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                class="text-[#989898] w-[20px] h-[20px]" data-sentry-element="svg"
+                                data-sentry-component="SettingsIcon" data-sentry-source-file="SettingsIcon.tsx">
+                                <title>settings icon</title>
+                                <path
+                                    d="M10.001 1L10 5M10.001 19V15M19 10.0015H15M1 10.0015H5M16.3652 3.63772L13.5029 6.5M3.63772 16.3652L6.50294 13.5M16.3652 16.3652L13.5 13.5M3.63772 3.63772L6.5 6.5"
+                                    stroke="currentColor" stroke-width="2" stroke-miterlimit="10"
+                                    vector-effect="non-scaling-stroke" data-sentry-element="path"
+                                    data-sentry-source-file="SettingsIcon.tsx"></path>
+                                <circle cx="10" cy="10" r="5" stroke="currentColor" stroke-width="2"
+                                    vector-effect="non-scaling-stroke" data-sentry-element="circle"
+                                    data-sentry-source-file="SettingsIcon.tsx"></circle>
+                            </svg>
+                            <span>{{ $t('settings') }}</span>
+                        </div>
+                    </RouterLink>
                 </section>
                 <div class="w-full h-[1px] bg-white/10"></div>
                 <section class="w-full p-[8px]">
                     <div @click="actionLogout"
                         class="w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center text-sm font-medium bg-transparent hover:bg-white/10 cursor-pointer">
-                        <span>Log out</span>
+                        <span>{{ $t('logout') }}</span>
                     </div>
                 </section>
                 <div class="w-full h-[1px] bg-white/10"></div>

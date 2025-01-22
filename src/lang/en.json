@@ -1,3 +1,26 @@
 {
-  "no_found_accounts": "There are no accounts in this vault"
+  "get_pro": "Get Pro",
+  "setup_profile": "Set up profile",
+  "settings": "Settings",
+  "logout": "Log out",
+  "no_found_accounts": "There are no accounts in this vault",
+  "no_found_vaults_this_profile": "There are no vaults in this profile",
+  "head_create_new_vault": "Create a new vault",
+  "head_edit_vault": "Edit vault",
+  "create_vault": "Create vault",
+  "edit_vault": "Edit vault",
+  "delete_vault": "Delete vault",
+  "delete_vault_message_alert": "Deleting the vault is permanent and irreversible. You will lose all accounts within it.",
+  "head_create_new_account": "Add a new account",
+  "add_account": "Add account",
+  "edit_account": "Edit account",
+  "delete_account": "Delete account",
+  "delete_account_message_alert": "Deleting the vault is permanent and irreversible. You will lose all accounts within it.",
+  "select_vault_where_you_want_place_account": "Select the vault where you want to place the account",
+  "account_section": "Section account",
+  "add_element": "Add element",
+  "save": "Save",
+  "add": "Add",
+  "cancel": "Cancel",
+  "you_sure": "Are you sure?"
 }

@@ -64,6 +64,7 @@
 import { auth } from '../data/auth';
 import { store } from '../data/store';
 import { loadStripe } from '@stripe/stripe-js';
+import { v4 as uuidv4 } from 'uuid';
 
 import navbar from '../components/nav/navbar.vue';
 import buttonFl from '../components/button/button-fl.vue';
@@ -91,6 +92,7 @@ export default {
             plans: [
                 {
                     id: 0,
+                    priceId: "price_1QkATHKMufpj7BQSxyPWzHgN",
                     name: "Pro",
                     descriptions: "For individuals",
                     price: "15",
@@ -134,20 +136,35 @@ export default {
         }
     },
     methods: {
-        async getProPlan() {
-            if (!this.stripe) {
-                this.stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-            }
+        async handleSubscribe() {
+            const priceId = "price_1QkATHKMufpj7BQSxyPWzHgN";
 
-            const { error } = await this.stripe.redirectToCheckout({
-                lineItems: [{ price: 'price_1QkATHKMufpj7BQSxyPWzHgN', quantity: 1 }], // Sostituisci con il tuo ID prezzo
-                mode: 'subscription',
-                successUrl: window.location.origin + '/success',
-                cancelUrl: window.location.origin + '/cancel',
-            });
+            try {
+                if (!this.stripe) {
+                    this.stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+                }
 
-            if (error) {
-                console.error("Errore durante il redirect a Stripe:", error.message);
+                const sid = uuidv4();
+
+                const result = await this.stripe.redirectToCheckout({
+                    lineItems: [
+                        {
+                            price: priceId,
+                            quantity: 1,
+                        },
+                    ],
+                    mode: "subscription",
+                    successUrl: `${window.location.origin}/confirm?success=true&session_id=${sid}`,
+                    cancelUrl: `${window.location.origin}/confirm?success=false`,
+                    billingAddressCollection: "required",
+                    locale: "it",
+                });
+
+                if (result.error) {
+                    console.error("Stripe Checkout Error:", result.error.message);
+                }
+            } catch (error) {
+                console.error("Stripe Initialization Error:", error.message);
             }
         },
 
@@ -163,7 +180,7 @@ export default {
                 return this.$router.push({ name: 'identity-login' });
             } else {
                 if (PRO) {
-                    this.getProPlan();
+                    this.handleSubscribe();
                 }
 
                 if (TEAM) {

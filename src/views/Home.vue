@@ -4,7 +4,7 @@
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
                 <buttonFl @click="openModalCreateVault" type="outline" size="small" :hasIcon="false"
-                    :disabled="!auth.profile?.is_subscribed && store.vaults.data.length >= 3" label="Create vault"
+                    :disabled="!auth.profile?.is_subscribed && store.vaults.data.length >= 3" :label="$t('create_vault')"
                     class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
                     <navItem @click="selectedVault(vault)"
@@ -38,11 +38,11 @@
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
                         <p>{{ $t('no_found_accounts') }}</p>
                         <buttonFl @click="store.modals.createAccount.open = !store.modals.createAccount.open"
-                            type="secondary" size="small" :hasIcon="false" label="Add account" />
+                            type="secondary" size="small" :hasIcon="false" :label="$t('add_account')" />
                     </div>
                     <div v-else-if="!store.vaults.data || store.vaults.data.length === 0 && !store.vaults.loading"
                         class="w-full my-6 flex flex-col gap-3 items-center justify-center text-center text-balance text-[#989898] text-base font-normal">
-                        <p>Non ci sono vault in questo profilo</p>
+                        <p>{{ $t('no_found_vaults_this_profile') }}</p>
                     </div>
                     <cardAccount v-if="!store.accounts.loading"
                         @contextmenu.prevent="showContextMenu($event, account, 'account')"
@@ -62,7 +62,7 @@
     </Transition>
     <!-- MODAL VAULT -->
     <Transition name="modal-fade">
-        <modalCreate v-if="store.modals.createVault.open" title="Create a new vault">
+        <modalCreate v-if="store.modals.createVault.open" :title="$t('head_create_new_vault')">
             <template #inner>
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.createVault.data.name" type="text" forInput="name" label=""
@@ -73,13 +73,13 @@
                         <div class="separator-end"></div>
                     </div>
                     <buttonFl @click="createVault" type="primary" size="default" :hasIcon="false"
-                        :loading="store.modals.createVault.loading" label="Create vault" class="w-full" />
+                        :loading="store.modals.createVault.loading" :label="$t('create_vault')" class="w-full" />
                 </form>
             </template>
         </modalCreate>
     </Transition>
     <Transition name="modal-fade">
-        <modalCreate v-if="store.modals.editVault.open" title="Edit vault">
+        <modalCreate v-if="store.modals.editVault.open" :title="$t('head_edit_vault')">
             <template #inner>
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.editVault.data.name" type="text" forInput="name" label=""
@@ -90,31 +90,31 @@
                         <div class="separator-end"></div>
                     </div>
                     <buttonFl @click="editVault" type="primary" size="default" :hasIcon="false"
-                        :loading="store.modals.editVault.loading" label="Save" class="w-full" />
+                        :loading="store.modals.editVault.loading" :label="$t('save')" class="w-full" />
                 </form>
             </template>
         </modalCreate>
     </Transition>
     <Transition name="modal-fade">
-        <modalDelete v-if="store.modals.deleteVault.open" head="Are you sure?"
-            paragraph="Deleting the vault is permanent and irreversible. You will lose all accounts within it.">
+        <modalDelete v-if="store.modals.deleteVault.open" :head="$t('you_sure')"
+            :paragraph="$t('delete_vault_message_alert')">
             <template #footer>
                 <buttonFl @click="closeModal" type="outline" size="default" :hasIcon="false" :loading="false"
-                    label="Cancel" class="w-full" />
+                    :label="$t('cancel')" class="w-full" />
                 <buttonFl @click="deleteVaultFromProfile" type="outline" size="default" :hasIcon="false"
-                    :loading="false" label="Delete vault" class="w-full danger" />
+                    :loading="false" :label="$t('delete_vault')" class="w-full danger" />
             </template>
         </modalDelete>
     </Transition>
 
     <!-- MODAL ACCOUNT -->
     <Transition name="modal-fade">
-        <modalCreate v-if="store.modals.createAccount.open" title="Add a new account">
+        <modalCreate v-if="store.modals.createAccount.open" :title="$t('head_create_new_account')">
             <template #inner>
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.createAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.createAccount.error.name" />
-                    <dropdown label="Select the vault where you want to place the account"
+                    <dropdown :label="$t('select_vault_where_you_want_place_account')"
                         :selected="store.modals.createAccount.data.vault_name_selected"
                         :error="store.modals.createAccount.error.vault_id">
                         <template #inner>
@@ -132,7 +132,7 @@
                     </dropdown>
                     <div class="separator relative mt-6 flex gap-[12px] items-center justify-center">
                         <div class="separator-start"></div>
-                        <span class="flex flex-none">Account section</span>
+                        <span class="flex flex-none">{{ $t('account_section') }}</span>
                         <div class="separator-end"></div>
                     </div>
                     <div v-if="store.modals.createAccount.fields.username" class="flex gap-[12px] items-center">
@@ -174,21 +174,21 @@
                     </div>
                     <div @contextmenu.prevent="showContextMenu($event, null, 'create-account-add-element')"
                         class="w-full h-[48px] px-[16px] py-[12px] rounded-[16px] border border-dashed text-base font-medium text-[#989898] border-[#7C7C7C] bg-[#2E2E2E] hover:bg-white/15 hover:border-white cursor-pointer transition-all duration-150">
-                        <span>Add element</span>
+                        <span>{{ $t('add_element') }}</span>
                     </div>
                     <buttonFl @click="createAccount" type="primary" size="default" :hasIcon="false"
-                        :loading="store.modals.createAccount.loading" label="Add" class="w-full" />
+                        :loading="store.modals.createAccount.loading" :label="$t('add')" class="w-full" />
                 </form>
             </template>
         </modalCreate>
     </Transition>
     <Transition name="modal-fade">
-        <modalCreate v-if="store.modals.editAccount.open" title="Edit account">
+        <modalCreate v-if="store.modals.editAccount.open" :title="$t('edit_account')">
             <template #inner>
                 <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                     <inputField v-model="store.modals.editAccount.data.name" type="text" forInput="name" label=""
                         placeholder="Name" :required="true" :error="store.modals.editAccount.error.name" />
-                    <dropdown label="Select the vault where you want to place the account"
+                    <dropdown :label="$t('select_vault_where_you_want_place_account')"
                         :selected="store.modals.editAccount.data.vault_name_selected"
                         :error="store.modals.editAccount.error.vault_id">
                         <template #inner>
@@ -205,7 +205,7 @@
                     </dropdown>
                     <div class="separator relative mt-6 flex gap-[12px] items-center justify-center">
                         <div class="separator-start"></div>
-                        <span class="flex flex-none">Account section</span>
+                        <span class="flex flex-none">{{ $t('account_section') }}</span>
                         <div class="separator-end"></div>
                     </div>
                     <div v-if="store.modals.editAccount.fields.username" class="flex gap-[12px] items-center">
@@ -247,22 +247,22 @@
                     </div>
                     <div @contextmenu.prevent="showContextMenu($event, null, 'edit-account-add-element')"
                         class="w-full h-[48px] px-[16px] py-[12px] rounded-[16px] border border-dashed text-base font-medium text-[#989898] border-[#7C7C7C] bg-[#2E2E2E] hover:bg-white/15 hover:border-white cursor-pointer transition-all duration-150">
-                        <span>Add element</span>
+                        <span>{{ $t('add_element') }}</span>
                     </div>
                     <buttonFl @click="editAccount" type="primary" size="default" :hasIcon="false"
-                        :loading="store.modals.editAccount.loading" label="Save" class="w-full" />
+                        :loading="store.modals.editAccount.loading" :label="$t('save')" class="w-full" />
                 </form>
             </template>
         </modalCreate>
     </Transition>
     <Transition name="modal-fade">
-        <modalDelete v-if="store.modals.deleteAccount.open" head="Are you sure?"
-            paragraph="Deleting your account is permanent and irreversible. You will lose all information in it.">
+        <modalDelete v-if="store.modals.deleteAccount.open" :head="$t('you_sure')"
+            :paragraph="$t('delete_account_message_alert')">
             <template #footer>
                 <buttonFl @click="closeModal" type="outline" size="default" :hasIcon="false" :loading="false"
-                    label="Cancel" class="w-full" />
+                    :label="$t('cancel')" class="w-full" />
                 <buttonFl @click="deleteAccountFromVault" type="outline" size="default" :hasIcon="false"
-                    :loading="false" label="Delete account" class="w-full danger" />
+                    :loading="false" :label="$t('delete_account')" class="w-full danger" />
             </template>
         </modalDelete>
     </Transition>
@@ -311,24 +311,24 @@
                     <div @click="openModalEditVault"
                         class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
                         <Pencil size="20" />
-                        <span>Edit vault</span>
+                        <span>{{ $t('edit_vault') }}</span>
                     </div>
                     <div @click="openModalDeleteVault"
                         class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
                         <Trash2 size="20" />
-                        <span>Delete vault</span>
+                        <span>{{ $t('delete_vault') }}</span>
                     </div>
                 </div>
                 <div v-if="store.contextMenu.type === 'account'">
                     <div @click="openModalEditAccount"
                         class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
                         <Pencil size="20" />
-                        <span>Edit account</span>
+                        <span>{{ $t('edit_account') }}</span>
                     </div>
                     <div @click="openModalDeleteAccount"
                         class="relative w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center bg-transparent hover:bg-white/10 text-white text-base font-medium cursor-pointer">
                         <Trash2 size="20" />
-                        <span>Delete account</span>
+                        <span>{{ $t('delete_account') }}</span>
                     </div>
                 </div>
                 <div v-if="store.contextMenu.type === 'create-account-add-element'">
@@ -428,7 +428,6 @@ import dropdown from '../components/dropdown/dropdown.vue';
 
 // ICONS
 import { Vault, Pencil, Trash2, Plus, Minus, Check } from 'lucide-vue-next';
-import { data } from 'autoprefixer';
 
 export default {
     name: "Home",

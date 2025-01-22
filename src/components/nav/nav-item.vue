@@ -19,7 +19,8 @@ export default {
     },
     data() {
         return {
-            store
+            store,
+            route: this.$route.name,
         }
     }
 }

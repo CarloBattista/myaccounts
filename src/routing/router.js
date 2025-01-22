@@ -7,6 +7,9 @@ import Login from '../views/onBoard/Login.vue';
 import Home from '../views/Home.vue';
 import Pricing from '../views/Pricing.vue';
 
+// Account
+import Settings from '../views/account/Settings.vue';
+
 const routes = [
     // onBoard
     {
@@ -31,6 +34,15 @@ const routes = [
         component: Pricing,
         props: true,
         meta: { title: "MyAccounts • Pricing" }
+    },
+
+    // Account
+    {
+        path: '/settings',
+        name: 'settings',
+        component: Settings,
+        props: true,
+        meta: { title: "MyAccounts" }
     },
 ];
 
