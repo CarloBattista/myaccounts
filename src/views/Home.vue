@@ -1,5 +1,5 @@
 <template>
-    <navbar :inHeroPlatform="true" />
+    <navbar :logo="true" :firstAction="store.vaults.data.length >= 1" :secondAction="true" :profile="true" :authenticated="auth.isAuthenticated" />
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">

@@ -1,5 +1,5 @@
 <template>
-    <navbar :inHeroPlatform="false" />
+    <navbar :logo="true" :firstAction="false" :secondAction="false" :profile="true" :authenticated="auth.isAuthenticated" />
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen">
             <div

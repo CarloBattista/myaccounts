@@ -1,5 +1,5 @@
 <template>
-    <navbar :inHeroPlatform="false" />
+    <navbar :logo="true" :firstAction="false" :secondAction="false" :profile="true" :authenticated="auth.isAuthenticated" />
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
@@ -79,7 +79,7 @@ import avatar from '../../components/avatar/avatar.vue';
 import dropdown from '../../components/dropdown/dropdown.vue';
 
 // ICONS
-import { Check } from 'lucide-vue-next';
+import { Check, User, CreditCard, LockKeyhole } from 'lucide-vue-next';
 
 export default {
     name: "Account",
@@ -90,7 +90,10 @@ export default {
         dropdown,
 
         // ICONS
-        Check
+        Check,
+        User,
+        CreditCard,
+        LockKeyhole
     },
     data() {
         return {
