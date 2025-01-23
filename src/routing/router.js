@@ -7,8 +7,8 @@ import Login from '../views/onBoard/Login.vue';
 import Home from '../views/Home.vue';
 import Pricing from '../views/Pricing.vue';
 
-// Account
-import Settings from '../views/account/Settings.vue';
+// Settings
+import Account from '../views/settings/Account.vue';
 
 const routes = [
     // onBoard
@@ -36,11 +36,11 @@ const routes = [
         meta: { title: "MyAccounts • Pricing" }
     },
 
-    // Account
+    // Settings
     {
-        path: '/settings',
+        path: '/settings/account',
         name: 'settings',
-        component: Settings,
+        component: Account,
         props: true,
         meta: { title: "MyAccounts" }
     },

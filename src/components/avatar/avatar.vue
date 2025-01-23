@@ -25,7 +25,7 @@
                 </section>
                 <div class="w-full h-[1px] mt-[8px] bg-white/10"></div>
                 <section class="w-full p-[8px]">
-                    <RouterLink to="/settings">
+                    <RouterLink to="/settings/account">
                         <div class="w-full h-[36px] px-[10px] rounded-[12px] flex gap-[8px] items-center text-sm font-medium bg-transparent hover:bg-white/10 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"
                                 class="text-[#989898] w-[20px] h-[20px]" data-sentry-element="svg"

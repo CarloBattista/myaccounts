@@ -614,7 +614,7 @@ export default {
                     }
 
                     this.store.toast.open = true;
-                    this.store.toast.message = "Vault creato correttamente!";
+                    this.store.toast.message = this.$t('toast_create_new_vault');
                 }
             } catch (e) {
                 console.error(e);
@@ -678,6 +678,9 @@ export default {
                     await this.getVaults();
                     this.closeContextMenu();
                     this.store.modals.editVault.open = false;
+
+                    this.store.toast.open = true;
+                    this.store.toast.message = this.$t('toast_edit_vault');
                 }
             } catch (e) {
                 console.error(e);
@@ -741,7 +744,7 @@ export default {
                 }
 
                 this.store.toast.open = true;
-                this.store.toast.message = "Vault eliminato correttamente!";
+                this.store.toast.message = this.$t('toast_delete_vault');
             } catch (e) {
                 console.error(e);
                 this.store.modals.editVault.open = false;
@@ -798,7 +801,7 @@ export default {
                     await this.addAccountToVault(accountId);
 
                     this.store.toast.open = true;
-                    this.store.toast.message = "Account aggiunto correttamente!";
+                    this.store.toast.message = this.$t('toast_add_new_account');
                 }
             } catch (e) {
                 console.error(e);
@@ -858,7 +861,7 @@ export default {
                     this.store.modals.editAccount.open = false;
 
                     this.store.toast.open = true;
-                    this.store.toast.message = "Account modificato correttamente!";
+                    this.store.toast.message = this.$t('toast_edit_account');
                 }
             } catch (e) {
                 console.error(e);
@@ -884,7 +887,7 @@ export default {
                     this.deleteAccount(fieldData);
 
                     this.store.toast.open = true;
-                    this.store.toast.message = "Account eliminato correttamente!";
+                    this.store.toast.message = this.$t('toast_delete_account');
                 }
             } catch (e) {
                 console.error(e);

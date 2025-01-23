@@ -66,7 +66,13 @@ export default {
     opacity: 1;
 }
 
-.navItem.selected-vault {
+.navItem:not(.not-vault).selected-vault {
+    background-color: transparent;
+    border-bottom: none;
+    color: #fff;
+}
+
+.router-link-active .navItem {
     background-color: transparent;
     border-bottom: none;
     color: #fff;

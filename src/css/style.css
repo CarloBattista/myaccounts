@@ -16,10 +16,16 @@ body {
   width: 100%;
 }
 
-.separator > div {
+.separator>div {
   position: relative;
   width: 100%;
   border: 1px dashed #434343;
+}
+
+.truncate {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* TRANSITIONS */
