@@ -10,8 +10,7 @@
                 <p>Get full access to all apps & features from only $0.33 per day — Cancel anytime.</p>
             </div>
             <div class="w-full mb-[40px] flex flex-col gap-[16px] items-center">
-                <div
-                    class="relative w-fit h-[44px] p-[4px] rounded-full flex gap-[2px] items-center bg-[#2E2E2E] cursor-pointer">
+                <div class="relative w-fit h-[44px] p-[4px] rounded-full flex gap-[2px] items-center bg-[#2E2E2E] cursor-pointer">
                     <button @click="cycle_selected = 'Yearly'" type="button"
                         class="h-full px-[16px] rounded-full flex items-center justify-center text-base font-medium transition-colors duration-150 cursor-pointer"
                         :class="{ 'text-white bg-[#111]': cycle_selected === 'Yearly', 'text-white/40 hover:text-white/60 hover:bg-[#111]/40': cycle_selected !== 'Yearly' }">Yearly</button>
@@ -19,8 +18,13 @@
                         class="h-full px-[16px] rounded-full flex items-center justify-center text-base font-medium transition-colors duration-150 cursor-pointer"
                         :class="{ 'text-white bg-[#111]': cycle_selected === 'Quarterly', 'text-white/40 hover:text-white/60 hover:bg-[#111]/40': cycle_selected !== 'Quarterly' }">Quarterly</button>
                 </div>
-                <p class="w-full text-base font-normal text-center"><strong class="text-[#2876FF]">Save 33%</strong> on
-                    a yearly subscription</p>
+                <p class="w-full text-base font-normal text-center"><strong class="text-[#2876FF]">Save 33%</strong> on a yearly subscription</p>
+                <toggleInput v-if="false" size="default" :selector="selectorData">
+                    <template #options>
+                        <button @click="handleAction($event, 'one')" type="button" class="relative z-[2] h-full px-[16px] rounded-full flex items-center justify-center text-base font-medium cursor-pointer">Yearly</button>
+                        <button @click="handleAction($event, 'two')" type="button" class="relative z-[2] h-full px-[16px] rounded-full flex items-center justify-center text-base font-medium cursor-pointer">Quarterly</button>
+                    </template>
+                </toggleInput>
             </div>
             <div class="max-w-[792px] mb-[40px] mx-auto">
                 <div class="w-full flex flex-col md:flex-row gap-[24px] items-start justify-between">
@@ -68,6 +72,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import navbar from '../components/nav/navbar.vue';
 import buttonFl from '../components/button/button-fl.vue';
+import toggleInput from '../components/toggle/toggle-input.vue';
 
 // ICONS
 import { RectangleEllipsis, LifeBuoy, Vault } from 'lucide-vue-next'
@@ -77,6 +82,7 @@ export default {
     components: {
         navbar,
         buttonFl,
+        toggleInput,
 
         // ICONS
         RectangleEllipsis,
@@ -133,6 +139,11 @@ export default {
                 }
             ],
             stripe: null,
+            selectorData: {
+                selected: "one",
+                width: null,
+                height: null,
+            }
         }
     },
     methods: {
@@ -186,6 +197,16 @@ export default {
                 if (TEAM) {
                     return false;
                 }
+            }
+        },
+        handleAction(event, option) {
+            const width = event.srcElement.clientWidth;
+            const height = event.srcElement.clientHeight;
+            
+            if (width && height) {
+                this.selectorData.selected = option;
+                this.selectorData.width = width;
+                this.selectorData.height = height;
             }
         }
     }

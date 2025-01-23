@@ -12,6 +12,12 @@
         </div>
         <div class="flex items-center justify-center"></div>
         <div class="flex gap-[10px] items-center justify-end">
+            <div v-if="!authenticated" class="flex gap-[24px] items-center">
+                <RouterLink to="/identity/login" class="text-white text-base font-normal hover:opacity-80 transition-opacity duration-200">Log in</RouterLink>
+                <RouterLink to="/pricing">
+                    <buttonFl type="primary" size="default" :hasIcon="false" label="Create free account" />
+                </RouterLink>
+            </div>
             <buttonFl v-if="inHeroPlatform && firstAction && authenticated" @click="store.modals.createAccount.open = !store.modals.createAccount.open" type="primary" size="small" :hasIcon="false" :label="$t('add_account')" />
             <RouterLink v-if="secondAction && authenticated" to="/pricing">
                 <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" size="small" :hasIcon="false" :label="$t('get_pro')" />

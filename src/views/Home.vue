@@ -1,11 +1,12 @@
 <template>
-    <navbar :logo="true" :firstAction="store.vaults.data.length >= 1" :secondAction="true" :profile="true" :authenticated="auth.isAuthenticated" />
+    <navbar :logo="true" :firstAction="store.vaults.data.length >= 1" :secondAction="true" :profile="true"
+        :authenticated="auth.isAuthenticated" />
     <div role="main" class="main-container mt-[32px]">
         <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
                 <buttonFl @click="openModalCreateVault" type="outline" size="small" :hasIcon="false"
-                    :disabled="!auth.profile?.is_subscribed && store.vaults.data.length >= 3" :label="$t('create_vault')"
-                    class="w-fit" />
+                    :disabled="!auth.profile?.is_subscribed && store.vaults.data.length >= 3"
+                    :label="$t('create_vault')" class="w-fit" />
                 <div class="flex flex-col gap-[2px]">
                     <navItem @click="selectedVault(vault)"
                         @contextmenu.prevent="showContextMenu($event, vault, 'vault')"
@@ -162,6 +163,14 @@
                             <Trash2 size="20" />
                         </div>
                     </div>
+                    <div v-if="store.modals.createAccount.fields.description" class="flex gap-[12px] items-start">
+                        <inputText v-model="store.modals.createAccount.data.description" forInput="description" label=""
+                            placeholder="Description" :required="true" :error="store.modals.createAccount.error.description" class="w-full" />
+                        <div @click="clearField('description')"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
                     <div v-if="store.modals.createAccount.fields.website_url" class="flex gap-[12px] items-center">
                         <inputField @input="websiteImage($event, store.modals.createAccount)"
                             v-model="store.modals.createAccount.data.website_url" type="text" forInput="websiteUrl"
@@ -231,6 +240,14 @@
                             label="" placeholder="Password" :required="true"
                             :error="store.modals.editAccount.error.password" class="w-full" />
                         <div @click="clearField('password')"
+                            class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
+                            <Trash2 size="20" />
+                        </div>
+                    </div>
+                    <div v-if="store.modals.editAccount.fields.description" class="flex gap-[12px] items-center">
+                        <inputText v-model="store.modals.editAccount.data.description" forInput="description" label=""
+                            placeholder="Description" :required="true" :error="store.modals.editAccount.error.description" class="w-full" />
+                        <div @click="clearField('description')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
                         </div>
@@ -423,6 +440,7 @@ import buttonFl from '../components/button/button-fl.vue';
 import modalCreate from '../components/modal/modal-create.vue';
 import modalDelete from '../components/modal/modal-delete.vue';
 import inputField from '../components/input/input-field.vue';
+import inputText from '../components/input/input-text.vue';
 import contextMenu from '../components/menu/context-menu.vue';
 import dropdown from '../components/dropdown/dropdown.vue';
 
@@ -439,6 +457,7 @@ export default {
         modalCreate,
         modalDelete,
         inputField,
+        inputText,
         contextMenu,
         dropdown,
 
