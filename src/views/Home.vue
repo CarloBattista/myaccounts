@@ -244,7 +244,7 @@
                             <Trash2 size="20" />
                         </div>
                     </div>
-                    <div v-if="store.modals.editAccount.fields.description" class="flex gap-[12px] items-center">
+                    <div v-if="store.modals.editAccount.fields.description" class="flex gap-[12px] items-start">
                         <inputText v-model="store.modals.editAccount.data.description" forInput="description" label=""
                             placeholder="Description" :required="true" :error="store.modals.editAccount.error.description" class="w-full" />
                         <div @click="clearField('description')"
