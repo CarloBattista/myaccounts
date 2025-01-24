@@ -29,7 +29,7 @@ const routes = [
         meta: { title: "MyAccounts • Sign up" }
     },
     {
-        path: '/forgot-password',
+        path: '/forgot-password/:id?',
         name: 'forgot-password',
         component: ForgotPassword,
         props: true,

@@ -1,5 +1,5 @@
 <template>
-    <button class="btn-fl rounded-full flex items-center justify-center font-medium" :class="'color-'+type, 'size-'+size, { 'cursor-wait': loading }" :disabled="disabled">
+    <button class="btn-fl rounded-full flex gap-[12px] items-center justify-center font-medium" :class="'color-'+type, 'size-'+size, { 'cursor-wait': loading }" :disabled="disabled">
         <loader v-if="loading" />
         <div v-if="hasIcon && !loading">
             <slot name="icon"></slot>

@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-screen">
         <div class="w-full h-full flex">
-            <section class="w-full h-full">
+            <section class="w-full md:w-[50%] h-full">
                 <div
                     class="max-w-[430px] mx-auto h-full pt-[64px] px-[24px] md:pt-0 flex flex-col gap-[48px] items-center md:justify-center">
                     <div class="h-[24px]">
@@ -15,22 +15,29 @@
                     </div>
                     <div class="flex flex-col gap-[12px] text-center">
                         <h2 class="text-white text-3xl font-medium">Welcome back</h2>
-                        <p class="text-[#989898] text-sm font-normal">We sent a temporary login code to email@gmail.com
+                        <p class="text-[#989898] text-sm font-normal text-balance">
+                            We sent a temporary login code to {{ fields.data?.email }} <br>
+                            <RouterLink to="/identity/login" class="font-normal underline cursor-pointer">Not you?
+                            </RouterLink>
                         </p>
                     </div>
-                    <form @submit.prevent class="w-full flex flex-col gap-[16px]">
-                        <inputField v-model="fields.data.email" type="email" forInput="email" label=""
-                            placeholder="Enter email address" :required="true" :error="fields.error.email"
+                    <a href="https://mail.google.com/mail/" target="_blank">
+                        <buttonFl type="outline" size="default" :hasIcon="true" :loading="fields.loading"
+                            label="Open mail box">
+                            <template #icon>
+                                <Mail size="16" />
+                            </template>
+                        </buttonFl>
+                    </a>
+                    <RouterLink to="/identity/login" class="w-full">
+                        <buttonFl type="outline" size="default" :hasIcon="false" :loading="fields.loading" label="Back"
                             class="w-full" />
-                        <div v-if="fields.error.general" class="w-full">
-                            <p class="w-full px-[4px] text-[#F34822] text-xs font-normal">{{ fields.error.general }}</p>
-                        </div>
-                        <buttonFl @click="actionLogin" type="primary" size="default" :hasIcon="false"
-                            :loading="fields.loading" label="Continue" class="w-full" />
-                    </form>
+                    </RouterLink>
                 </div>
             </section>
-            <section class="w-full h-full hidden md:block bg-red-600"></section>
+            <section class="w-[50%] h-full hidden md:block">
+                <backgroundLogos />
+            </section>
         </div>
     </div>
 </template>
@@ -39,14 +46,22 @@
 import { supabase } from "../../lib/supabase";
 import { auth } from "../../data/auth";
 
+import backgroundLogos from "../../components/global/background-logos.vue";
 import inputField from '../../components/input/input-field.vue';
 import buttonFl from "../../components/button/button-fl.vue";
+
+// ICONS
+import { Mail } from 'lucide-vue-next'
 
 export default {
     name: "ForgotPassword",
     components: {
+        backgroundLogos,
         inputField,
-        buttonFl
+        buttonFl,
+
+        // ICONS
+        Mail
     },
     data() {
         return {
@@ -64,59 +79,11 @@ export default {
                     general: null
                 },
                 loading: false
-            }
+            },
+            codeInputs: Array(6).fill("")
         }
     },
     methods: {
-        async actionLogin() {
-            this.fields.loading = true;
-
-            this.clearErrors();
-
-            if (!this.validateEmail(this.fields.data.email)) {
-                this.fields.error.email = "Inserisci un indirizzo email valido";
-                this.fields.loading = false;
-                return;
-            }
-
-            if (!this.fields.data.password) {
-                this.fields.error.password = "La password è obbligatoria";
-                this.fields.loading = false;
-                return;
-            }
-
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: this.fields.data.email,
-                    password: this.fields.data.password,
-                })
-
-                if (!error) {
-                    // console.log(data);
-                    this.auth.user = data.user;
-                    this.auth.session = data.session;
-                    this.auth.isAuthenticated = true;
-
-                    // Clear inputs after login
-                    this.fields.data.email = "";
-                    this.fields.data.password = "";
-
-                    // Clear errors after login
-                    this.clearErrors();
-
-                    // Push user to home after login
-                    this.$router.push({ name: 'home' });
-                } else {
-                    if (error.code === "invalid_credentials") {
-                        this.fields.error.general = "Credenziali non valide!";
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.fields.loading = false;
-            }
-        },
         async getEmail() {
             try {
                 const { data, error } = await supabase
@@ -128,34 +95,46 @@ export default {
                 if (!error) {
                     // console.log(data);
                     this.fields.data.email = data?.user_email;
+
+                    this.sendCode();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async sendCode() {
+            try {
+                const { data, error } = await supabase.auth.signInWithOtp({
+                    email: this.fields.data.email,
+                    options: {
+                        emailRedirectTo: 'http://localhost:5173/'
+                    }
+                })
+
+                if (!error) {
+                    console.log(data)
                 }
             } catch (e) {
                 console.error(e);
             }
         },
 
-        clearErrors() {
-            this.fields.error.email = null;
-            this.fields.error.password = null;
-            this.fields.error.general = null;
-        },
-        validateEmail(email) {
-            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            return emailRegex.test(email);
-        },
-        goForgotPassword() {
-            this.fields.loading = true;
+        focusNext(index) {
+            const input = this.$refs.inputs[index];
+            const nextInput = this.$refs.inputs[index + 1];
 
-            if (!this.fields.data.email) {
-                return;
+            // Passa al prossimo input solo se il valore è stato inserito
+            if (input.value.length === 1 && nextInput) {
+                nextInput.focus();
             }
+        },
+        focusPrevious(index, event) {
+            const input = this.$refs.inputs[index];
+            const prevInput = this.$refs.inputs[index - 1];
 
-            try {
-                this.$router.push({ name: 'forgot-password', params: { id: null } });
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.fields.loading = false;
+            // Torna indietro solo se il valore è vuoto e si preme Backspace
+            if (event.key === 'Backspace' && input.value === '' && prevInput) {
+                prevInput.focus();
             }
         },
     },

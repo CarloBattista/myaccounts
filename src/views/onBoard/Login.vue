@@ -26,8 +26,10 @@
                         </div>
                         <buttonFl @click="actionLogin" type="primary" size="default" :hasIcon="false"
                             :loading="fields.loading" label="Continue" class="w-full" />
-                        <button @click="goForgotPassword" v-if="fields.data.email" type="button"
-                            class="text-white text-sm font-medium underline text-center">Forgot your password?</button>
+                        <div class="text-center h-[24px]">
+                            <button @click="goForgotPassword" v-if="fields.data.email" type="button"
+                            class="text-white text-sm font-medium underline">Forgot your password?</button>
+                        </div>
                     </form>
                 </div>
             </section>
@@ -66,7 +68,8 @@ export default {
                 error: {
                     email: null,
                     password: null,
-                    general: null
+                    general: null,
+                    hidden: null
                 },
                 loading: false
             }
@@ -138,7 +141,38 @@ export default {
                 console.error(e);
             }
         },
+        async checkEmail() {
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('user_email', this.fields.data.email)
+                    .single()
 
+                if (!error) {
+                    // console.log(data);
+
+                    if (data.user_id) {
+                        this.fields.data.userId = data.user_id;
+                        this.fields.error.hidden = null;
+                    } else {
+                        this.fields.data.userId = null;
+                        this.fields.error.hidden = "email_not_search";
+                    }
+                } else {
+                    this.fields.data.userId = null;
+                    this.fields.error.hidden = "email_not_search";
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        debounce(func, delay) {
+            // Funzione di debounce
+            clearTimeout(this.debounceTimeout);
+            this.debounceTimeout = setTimeout(func, delay);
+        },
         clearErrors() {
             this.fields.error.email = null;
             this.fields.error.password = null;
@@ -151,12 +185,14 @@ export default {
         goForgotPassword() {
             this.fields.loading = true;
 
-            if (!this.fields.data.email) {
+            if (!this.fields.data.email || !this.validateEmail(this.fields.data.email) || !this.fields.data.userId || this.fields.error.hidden === "email_not_search") {
+                this.fields.error.email = "Inserisci un indirizzo email valido o esistente";
+                this.fields.loading = false;
                 return;
             }
 
             try {
-                this.$router.push({ name: 'forgot-password', params: { id: null } });
+                this.$router.push({ name: 'forgot-password', params: { id: this.fields.data?.userId } });
             } catch (e) {
                 console.error(e);
             } finally {
@@ -177,6 +213,16 @@ export default {
             immediate: true,
             deep: true
         },
+        'fields.data.email': {
+            handler(value) {
+                if (value) {
+                    // Utilizza la funzione di debounce
+                    this.debounce(() => this.checkEmail(), 500);
+                }
+            },
+            immediate: true,
+            deep: true
+        }
     }
 }
 </script>
