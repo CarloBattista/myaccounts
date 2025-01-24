@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { auth } from '../data/auth';
 
 // onBoard
 import Login from '../views/onBoard/Login.vue';
@@ -19,21 +20,21 @@ const routes = [
         name: 'identity-login',
         component: Login,
         props: true,
-        meta: { title: "MyAccounts • Login" }
+        meta: { title: "MyAccounts • Login", requiresAuth: false, role: 'guest' }
     },
     {
         path: '/identity/signup',
         name: 'identity-signup',
         component: Signup,
         props: true,
-        meta: { title: "MyAccounts • Sign up" }
+        meta: { title: "MyAccounts • Sign up", requiresAuth: false, role: 'guest' }
     },
     {
-        path: '/forgot-password/:id?',
+        path: '/forgot-password/:id',
         name: 'forgot-password',
         component: ForgotPassword,
         props: true,
-        meta: { title: "MyAccounts • Forgot password" }
+        meta: { title: "MyAccounts • Forgot password", requiresAuth: false, role: 'guest' }
     },
 
     // General
@@ -42,14 +43,14 @@ const routes = [
         name: 'home',
         component: Home,
         props: true,
-        meta: { title: "MyAccounts • Home" }
+        meta: { title: "MyAccounts • Home", requiresAuth: true, role: 'auth' }
     },
     {
         path: '/pricing',
         name: 'pricing',
         component: Pricing,
         props: true,
-        meta: { title: "MyAccounts • Pricing" }
+        meta: { title: "MyAccounts • Pricing", requiresAuth: false, role: 'guest' }
     },
 
     // Settings
@@ -58,7 +59,7 @@ const routes = [
         name: 'settings',
         component: Account,
         props: true,
-        meta: { title: "MyAccounts" }
+        meta: { title: "MyAccounts", requiresAuth: true, role: 'auth' }
     },
 ];
 
@@ -68,12 +69,26 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    const pageTitle = to.meta.title;
-    if (pageTitle) {
-        document.title = pageTitle;
-    } else {
-        document.title = "MyAccounts";
+    const pageTitle = to.meta.title || "MyAccounts";
+    document.title = pageTitle;
+
+    const isAuthenticated = localStorage.getItem('isAuthenticated') || "false";
+    console.log(isAuthenticated);
+
+    if (to.name === 'pricing') {
+        return next();
     }
+
+    // Reindirizza alla home se un utente autenticato prova ad accedere a pagine per guest
+    if (to.meta.role === 'guest' && isAuthenticated === "true" && isAuthenticated) {
+        return next({ name: 'home' });
+    }
+
+    // Reindirizza alla pagina di login se un utente non autenticato prova ad accedere a pagine protette
+    if (to.meta.role === 'auth' && isAuthenticated === "false" && !isAuthenticated) {
+        return next({ name: 'identity-login' });
+    }
+
     next();
 });
 

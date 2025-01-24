@@ -146,6 +146,7 @@ export default {
                     this.getEmail();
                 } else {
                     this.fields.data.userId = null;
+                    this.$router.push({ name: 'identity-login' });
                 }
             },
             immediate: true,

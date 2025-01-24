@@ -52,6 +52,7 @@ export default {
           // console.log(data);
           this.auth.user = data.user;
           this.auth.isAuthenticated = true;
+          localStorage.setItem('isAuthenticated', true);
           this.getSession();
         }
       } catch (e) {

@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-screen">
         <div class="w-full h-full flex">
-            <section class="w-full h-full">
+            <section class="w-full md:w-[50%] h-full">
                 <div
                     class="max-w-[430px] mx-auto h-full pt-[64px] px-[24px] md:pt-0 flex flex-col gap-[48px] items-center md:justify-center text-center">
                     <div class="h-[24px]">
@@ -13,7 +13,12 @@
                                 fill="white" />
                         </svg>
                     </div>
-                    <h2 class="text-white text-3xl font-medium">Create your free account</h2>
+                    <div class="flex flex-col gap-[12px] text-center">
+                        <h2 class="text-white text-3xl font-medium">Create your free account</h2>
+                        <p class="text-[#989898] text-sm font-normal text-center">Already have an account?
+                            <RouterLink to="/identity/login" class="font-semibold">Log in</RouterLink>
+                        </p>
+                    </div>
                     <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                         <inputField v-model="fields.data.email" type="email" forInput="email" label=""
                             placeholder="Enter email address" :required="true" :error="fields.error.email"
@@ -26,13 +31,12 @@
                         </div>
                         <buttonFl @click="actionSignup" type="primary" size="default" :hasIcon="false"
                             :loading="fields.loading" label="Continue" class="w-full" />
-                        <p class="mt-[38px] text-[#989898] text-sm font-normal text-center">Already have an account?
-                            <RouterLink to="/identity/login" class="font-semibold">Log in</RouterLink>
-                        </p>
                     </form>
                 </div>
             </section>
-            <section class="w-full h-full hidden md:block bg-red-600"></section>
+            <section class="w-[50%] h-full hidden md:block">
+                <backgroundLogos />
+            </section>
         </div>
     </div>
 </template>
@@ -41,12 +45,14 @@
 import { supabase } from "../../lib/supabase";
 import { auth } from "../../data/auth";
 
+import backgroundLogos from "../../components/global/background-logos.vue";
 import inputField from '../../components/input/input-field.vue';
 import buttonFl from "../../components/button/button-fl.vue";
 
 export default {
     name: "Signup",
     components: {
+        backgroundLogos,
         inputField,
         buttonFl
     },

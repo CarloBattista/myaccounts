@@ -14,7 +14,7 @@
         <div class="flex gap-[10px] items-center justify-end">
             <div v-if="!authenticated" class="flex gap-[24px] items-center">
                 <RouterLink to="/identity/login" class="text-white text-base font-normal hover:opacity-80 transition-opacity duration-200">Log in</RouterLink>
-                <RouterLink to="/pricing">
+                <RouterLink to="/identity/signup">
                     <buttonFl type="primary" size="default" :hasIcon="false" label="Create free account" />
                 </RouterLink>
             </div>

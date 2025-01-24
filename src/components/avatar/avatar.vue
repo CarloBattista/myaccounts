@@ -106,6 +106,7 @@ export default {
                     this.auth.profile = null;
                     this.auth.isAuthenticated = false;
                     this.auth.PROFILE_AUTH_ID = null;
+                    localStorage.setItem('isAuthenticated', false);
 
                     localStorage.removeItem('selected-vault');
 

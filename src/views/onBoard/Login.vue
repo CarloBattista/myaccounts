@@ -13,7 +13,12 @@
                                 fill="white" />
                         </svg>
                     </div>
-                    <h2 class="text-white text-3xl font-medium">Welcome back</h2>
+                    <div class="flex flex-col gap-[12px] text-center">
+                        <h2 class="text-white text-3xl font-medium">Welcome back</h2>
+                        <p class="text-[#989898] text-sm font-normal text-center">Don't have an account?
+                            <RouterLink to="/identity/signup" class="font-semibold">Create one</RouterLink>
+                        </p>
+                    </div>
                     <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                         <inputField v-model="fields.data.email" type="email" forInput="email" label=""
                             placeholder="Enter email address" :required="true" :error="fields.error.email"
@@ -28,7 +33,7 @@
                             :loading="fields.loading" label="Continue" class="w-full" />
                         <div class="text-center h-[24px]">
                             <button @click="goForgotPassword" v-if="fields.data.email" type="button"
-                            class="text-white text-sm font-medium underline">Forgot your password?</button>
+                                class="text-white text-sm font-medium underline">Forgot your password?</button>
                         </div>
                     </form>
                 </div>
