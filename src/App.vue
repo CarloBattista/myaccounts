@@ -18,6 +18,8 @@ import { supabase } from "./lib/supabase";
 import { auth } from "./data/auth";
 import { store } from "./data/store";
 
+import { UAParser } from 'ua-parser-js';
+
 import i18n from "./lib/i18n";
 
 import toast from "./components/toast/toast.vue";
@@ -99,10 +101,22 @@ export default {
         this.$i18n.locale = fallbackLang;
         localStorage.setItem('locale', fallbackLang);
       }
+    },
+    checkDevice() {
+      const parser = new UAParser();
+      const deviceInfo = parser.getResult();
+      return console.log(deviceInfo)
+
+      console.log(`
+                Device: ${deviceInfo.device.type}
+                OS: ${deviceInfo.os.name} ${deviceInfo.os.version}
+                Browser: ${deviceInfo.browser.name} ${deviceInfo.browser.version}
+            `);
     }
   },
   mounted() {
     this.getUser();
+    this.checkDevice();
   },
   watch: {
     'auth.user': {

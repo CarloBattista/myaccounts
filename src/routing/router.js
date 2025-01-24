@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 // onBoard
 import Login from '../views/onBoard/Login.vue';
+import Signup from '../views/onBoard/Signup.vue';
+import ForgotPassword from '../views/onBoard/ForgotPassword.vue';
 
 // General
 import Home from '../views/Home.vue';
@@ -13,11 +15,25 @@ import Account from '../views/settings/Account.vue';
 const routes = [
     // onBoard
     {
-        path: '/identity/login',
+        path: '/identity/login/:id?',
         name: 'identity-login',
         component: Login,
         props: true,
-        meta: { title: "MyAccounts" }
+        meta: { title: "MyAccounts • Login" }
+    },
+    {
+        path: '/identity/signup',
+        name: 'identity-signup',
+        component: Signup,
+        props: true,
+        meta: { title: "MyAccounts • Sign up" }
+    },
+    {
+        path: '/forgot-password',
+        name: 'forgot-password',
+        component: ForgotPassword,
+        props: true,
+        meta: { title: "MyAccounts • Forgot password" }
     },
 
     // General

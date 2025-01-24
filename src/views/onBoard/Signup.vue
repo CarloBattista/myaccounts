@@ -1,9 +1,9 @@
 <template>
     <div class="w-full h-screen">
         <div class="w-full h-full flex">
-            <section class="w-full md:w-[50%] h-full">
+            <section class="w-full h-full">
                 <div
-                    class="max-w-[430px] mx-auto h-full pt-[64px] px-[24px] md:pt-0 flex flex-col gap-[48px] items-center md:justify-center">
+                    class="max-w-[430px] mx-auto h-full pt-[64px] px-[24px] md:pt-0 flex flex-col gap-[48px] items-center md:justify-center text-center">
                     <div class="h-[24px]">
                         <svg class="h-full w-auto" viewBox="0 0 43 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.200195 0.399902H6.2002V24.3999H0.200195V0.399902Z" fill="white" />
@@ -13,27 +13,26 @@
                                 fill="white" />
                         </svg>
                     </div>
-                    <h2 class="text-white text-3xl font-medium">Welcome back</h2>
+                    <h2 class="text-white text-3xl font-medium">Create your free account</h2>
                     <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                         <inputField v-model="fields.data.email" type="email" forInput="email" label=""
                             placeholder="Enter email address" :required="true" :error="fields.error.email"
                             class="w-full" />
-                        <inputField v-model="fields.data.password" ref="passwordInput" type="password"
-                            forInput="password" label="" placeholder="Enter password" :required="true"
-                            :error="fields.error.password" class="w-full" />
+                        <inputField v-model="fields.data.password" type="password" forInput="password" label=""
+                            placeholder="Enter password" :required="true" :error="fields.error.password"
+                            class="w-full" />
                         <div v-if="fields.error.general" class="w-full">
                             <p class="w-full px-[4px] text-[#F34822] text-xs font-normal">{{ fields.error.general }}</p>
                         </div>
-                        <buttonFl @click="actionLogin" type="primary" size="default" :hasIcon="false"
+                        <buttonFl @click="actionSignup" type="primary" size="default" :hasIcon="false"
                             :loading="fields.loading" label="Continue" class="w-full" />
-                        <button @click="goForgotPassword" v-if="fields.data.email" type="button"
-                            class="text-white text-sm font-medium underline text-center">Forgot your password?</button>
+                        <p class="mt-[38px] text-[#989898] text-sm font-normal text-center">Already have an account?
+                            <RouterLink to="/identity/login" class="font-semibold">Log in</RouterLink>
+                        </p>
                     </form>
                 </div>
             </section>
-            <section class="w-[50%] h-full hidden md:block">
-                <backgroundLogos />
-            </section>
+            <section class="w-full h-full hidden md:block bg-red-600"></section>
         </div>
     </div>
 </template>
@@ -42,14 +41,12 @@
 import { supabase } from "../../lib/supabase";
 import { auth } from "../../data/auth";
 
-import backgroundLogos from "../../components/global/background-logos.vue";
 import inputField from '../../components/input/input-field.vue';
 import buttonFl from "../../components/button/button-fl.vue";
 
 export default {
-    name: "Login",
+    name: "Signup",
     components: {
-        backgroundLogos,
         inputField,
         buttonFl
     },
@@ -59,7 +56,6 @@ export default {
 
             fields: {
                 data: {
-                    userId: null,
                     email: "",
                     password: "",
                 },
@@ -73,7 +69,7 @@ export default {
         }
     },
     methods: {
-        async actionLogin() {
+        async actionSignup() {
             this.fields.loading = true;
 
             this.clearErrors();
@@ -91,16 +87,16 @@ export default {
             }
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabase.auth.signUp({
                     email: this.fields.data.email,
                     password: this.fields.data.password,
                 })
 
                 if (!error) {
                     // console.log(data);
-                    this.auth.user = data.user;
-                    this.auth.session = data.session;
-                    this.auth.isAuthenticated = true;
+
+                    const userId = data.user.id;
+                    const userEmail = data.user.email;
 
                     // Clear inputs after login
                     this.fields.data.email = "";
@@ -108,12 +104,13 @@ export default {
 
                     // Clear errors after login
                     this.clearErrors();
+                    await this.createProfile(userId, userEmail);
 
-                    // Push user to home after login
-                    this.$router.push({ name: 'home' });
+                    // Push user to login after signup
+                    this.$router.push({ name: 'identity-login', params: { id: userId } });
                 } else {
-                    if (error.code === "invalid_credentials") {
-                        this.fields.error.general = "Credenziali non valide!";
+                    if (error.code === "email_address_invalid") {
+                        this.fields.error.email = "Indirizzo email non valide!";
                     }
                 }
             } catch (e) {
@@ -122,17 +119,14 @@ export default {
                 this.fields.loading = false;
             }
         },
-        async getEmail() {
+        async createProfile(userId, userEmail) {
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('user_email')
-                    .eq('user_id', this.fields.data.userId)
-                    .single()
+                    .insert({ user_id: userId, is_freezed: false, is_subscribed: false, lang: "en", user_email: userEmail })
 
                 if (!error) {
-                    // console.log(data);
-                    this.fields.data.email = data?.user_email;
+                    // console.log(data)
                 }
             } catch (e) {
                 console.error(e);
@@ -147,35 +141,6 @@ export default {
         validateEmail(email) {
             const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             return emailRegex.test(email);
-        },
-        goForgotPassword() {
-            this.fields.loading = true;
-
-            if (!this.fields.data.email) {
-                return;
-            }
-
-            try {
-                this.$router.push({ name: 'forgot-password', params: { id: null } });
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.fields.loading = false;
-            }
-        }
-    },
-    watch: {
-        '$route.params.id': {
-            handler(value) {
-                if (value) {
-                    this.fields.data.userId = value;
-                    this.getEmail();
-                } else {
-                    this.fields.data.userId = null;
-                }
-            },
-            immediate: true,
-            deep: true
         },
     }
 }

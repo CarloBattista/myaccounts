@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-screen">
         <div class="w-full h-full flex">
-            <section class="w-full md:w-[50%] h-full">
+            <section class="w-full h-full">
                 <div
                     class="max-w-[430px] mx-auto h-full pt-[64px] px-[24px] md:pt-0 flex flex-col gap-[48px] items-center md:justify-center">
                     <div class="h-[24px]">
@@ -13,27 +13,24 @@
                                 fill="white" />
                         </svg>
                     </div>
-                    <h2 class="text-white text-3xl font-medium">Welcome back</h2>
+                    <div class="flex flex-col gap-[12px] text-center">
+                        <h2 class="text-white text-3xl font-medium">Welcome back</h2>
+                        <p class="text-[#989898] text-sm font-normal">We sent a temporary login code to email@gmail.com
+                        </p>
+                    </div>
                     <form @submit.prevent class="w-full flex flex-col gap-[16px]">
                         <inputField v-model="fields.data.email" type="email" forInput="email" label=""
                             placeholder="Enter email address" :required="true" :error="fields.error.email"
                             class="w-full" />
-                        <inputField v-model="fields.data.password" ref="passwordInput" type="password"
-                            forInput="password" label="" placeholder="Enter password" :required="true"
-                            :error="fields.error.password" class="w-full" />
                         <div v-if="fields.error.general" class="w-full">
                             <p class="w-full px-[4px] text-[#F34822] text-xs font-normal">{{ fields.error.general }}</p>
                         </div>
                         <buttonFl @click="actionLogin" type="primary" size="default" :hasIcon="false"
                             :loading="fields.loading" label="Continue" class="w-full" />
-                        <button @click="goForgotPassword" v-if="fields.data.email" type="button"
-                            class="text-white text-sm font-medium underline text-center">Forgot your password?</button>
                     </form>
                 </div>
             </section>
-            <section class="w-[50%] h-full hidden md:block">
-                <backgroundLogos />
-            </section>
+            <section class="w-full h-full hidden md:block bg-red-600"></section>
         </div>
     </div>
 </template>
@@ -42,14 +39,12 @@
 import { supabase } from "../../lib/supabase";
 import { auth } from "../../data/auth";
 
-import backgroundLogos from "../../components/global/background-logos.vue";
 import inputField from '../../components/input/input-field.vue';
 import buttonFl from "../../components/button/button-fl.vue";
 
 export default {
-    name: "Login",
+    name: "ForgotPassword",
     components: {
-        backgroundLogos,
         inputField,
         buttonFl
     },
@@ -162,7 +157,7 @@ export default {
             } finally {
                 this.fields.loading = false;
             }
-        }
+        },
     },
     watch: {
         '$route.params.id': {
