@@ -130,9 +130,60 @@ export default {
                 const { data, error } = await supabase
                     .from('profiles')
                     .insert({ user_id: userId, is_freezed: false, is_subscribed: false, lang: "en", user_email: userEmail })
+                    .select('id')
 
                 if (!error) {
                     // console.log(data)
+                    const profileId = data[0].id;
+
+                    this.addDeviceInfo(profileId);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async addDeviceInfo(profileId) {
+            try {
+                const { data, error } = await supabase
+                    .from('devices')
+                    .insert({
+                        city: this.auth.deviceInfo?.city,
+                        country: this.auth.deviceInfo?.country,
+                        country_code: this.auth.deviceInfo?.country_code,
+                        time_zone: this.auth.deviceInfo?.time_zone,
+                        ip_address: this.auth.deviceInfo?.ip_address,
+                        model: this.auth.deviceInfo?.model,
+                        name: this.auth.deviceInfo?.name,
+                        os: this.auth.deviceInfo?.os,
+                        os_version: this.auth.deviceInfo?.os_version,
+                        type: this.auth.deviceInfo?.type,
+                        status: this.auth.deviceInfo?.status,
+                        user_agent: this.auth.deviceInfo?.user_agent,
+                    })
+                    .select('id')
+
+                if (!error) {
+                    // console.log(data)
+                    const deviceId = data[0].id;
+
+                    await this.addDeviceToProfile(profileId, deviceId);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        async addDeviceToProfile(profileId, deviceId) {
+            try {
+                const { data, error } = await supabase
+                    .from('profile_devices')
+                    .insert({
+                        profile_id: profileId,
+                        device_id: deviceId,
+                    })
+                    .select('id')
+
+                if (!error) {
+                    // console.log(data);
                 }
             } catch (e) {
                 console.error(e);

@@ -122,6 +122,8 @@ export default {
                 } else {
                     if (error.code === "invalid_credentials") {
                         this.fields.error.general = "Credenziali non valide!";
+                    } else if (error.code === "email_not_confirmed") {
+                        this.fields.error.general = "Devi prima confermare l'email";
                     }
                 }
             } catch (e) {

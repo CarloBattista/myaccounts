@@ -41,35 +41,43 @@
                     class="w-[unset] flex gap-[24px] py-[4px] px-[20px] my-[-4px] mx-[calc(20px*-1)] overflow-x-auto scrollbar-none">
                 </div>
                 <div class="w-full flex flex-col gap-[48px]">
-                    <section class="w-full flex flex-col gap-[24px]">
-                        <avatar size="big" :hasInputFile="true" :hasProfileMenu="false" />
-                        <div class="flex flex-col gap-[4px]">
-                            <h2 class="text-white text-3xl font-medium truncate">{{ auth.profile?.first_name }} {{
-                                auth.profile?.last_name }}</h2>
-                            <p class="text-[#989898] text-xs font-medium">{{ auth.user?.email }}</p>
+                    <section class="w-full flex flex-col gap-[16px]">
+                        <div class="w-full">
+                            <h2 class="text-white text-2xl font-medium">{{ $t('manage_devices') }}</h2>
                         </div>
-                    </section>
-                    <section>
-                        <dropdown :label="$t('select_language')" :selected="getLang" :error="null">
-                            <template #inner>
-                                <div @click="auth.lang = 'en'"
-                                    class="w-full h-[36px] rounded-[10px] flex items-center bg-transparent hover:bg-white/10 cursor-pointer"
-                                    :class="{ 'bg-white/20': auth.lang === 'en' }">
-                                    <div class="h-full aspect-square flex items-center justify-center">
-                                        <Check v-if="auth.lang === 'en'" size="20" />
+                        <div class="w-full grid grid-cols-1 md:grid-cols-2">
+                            <div v-for="(device, deviceIndex) in auth.devices.data" :key="deviceIndex"
+                                class="w-full min-h-[150px] rounded-[24px] p-[12px] bg-[#2E2E2E]">
+                                <div class="w-full flex gap-[12px] items-center justify-start">
+                                    <div class="relative h-[32px] aspect-square flex items-center justify-center">
+                                        <LaptopMinimal v-if="device.devices?.type === 'Desktop'" size="24" />
+                                        <Smartphone v-if="device.devices?.type === 'Phone'" size="24" />
+                                        <Tablet v-if="device.devices?.type === 'Tablet'" size="24" />
                                     </div>
-                                    <span>English</span>
+                                    <span class="text-white text-xl font-medium">{{ device.devices?.type }} - {{
+                                        device.devices?.name }}</span>
                                 </div>
-                                <div @click="auth.lang = 'it'"
-                                    class="w-full h-[36px] rounded-[10px] flex items-center bg-transparent hover:bg-white/10 cursor-pointer"
-                                    :class="{ 'bg-white/20': auth.lang === 'it' }">
-                                    <div class="h-full aspect-square flex items-center justify-center">
-                                        <Check v-if="auth.lang === 'it'" size="20" />
+                                <div class="w-full py-[12px] flex flex-col gap-[6px]">
+                                    <div class="w-full flex gap-[8px] items-center text-[#989898] text-sm">
+                                        <div class="h-[20px] aspect-square flex items-center justify-center">
+                                            <Clock size="16" />
+                                        </div>
+                                        <span>{{ device.devices?.updated_at }}</span>
                                     </div>
-                                    <span>Italiano</span>
+                                    <div class="w-full flex gap-[8px] items-center text-[#989898] text-sm">
+                                        <div class="h-[20px] aspect-square flex items-center justify-center">
+                                            <MapPin size="16" />
+                                        </div>
+                                        <span>{{ device.devices?.country === "IT" ? "Italia" : device.devices?.country
+                                            }}</span>
+                                    </div>
                                 </div>
-                            </template>
-                        </dropdown>
+                                <div class="w-full mt-[24px]">
+                                    <buttonFl @click="exitDevice(device)" type="outline" size="default" :hasIcon="false" :label="$t('exit')"
+                                        class="w-full" />
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </div>
             </div>
@@ -84,26 +92,29 @@ import { store } from '../../data/store';
 
 import navbar from '../../components/nav/navbar.vue';
 import navItem from '../../components/nav/nav-item.vue';
-import avatar from '../../components/avatar/avatar.vue';
-import dropdown from '../../components/dropdown/dropdown.vue';
+import buttonFl from '../../components/button/button-fl.vue';
 
 // ICONS
-import { Check, User, CreditCard, LockKeyhole, Laptop } from 'lucide-vue-next';
+import { Check, User, CreditCard, LockKeyhole, Laptop, LaptopMinimal, Smartphone, Tablet, Clock, MapPin } from 'lucide-vue-next';
 
 export default {
-    name: "Account",
+    name: "Devices",
     components: {
         navbar,
         navItem,
-        avatar,
-        dropdown,
+        buttonFl,
 
         // ICONS
         Check,
         User,
         CreditCard,
         LockKeyhole,
-        Laptop
+        Laptop,
+        LaptopMinimal,
+        Smartphone,
+        Tablet,
+        Clock,
+        MapPin
     },
     data() {
         return {
@@ -111,39 +122,31 @@ export default {
             auth,
         }
     },
-    computed: {
-        getLang() {
-            if (this.auth.lang === 'en') {
-                return "Inglese"
-            } else if (this.auth.lang === 'it') {
-                return "Italiano"
-            }
-        }
-    },
     methods: {
-        async handleLang() {
+        async getDevices() {
+            if (!this.auth.PROFILE_AUTH_ID) {
+                return;
+            }
+
             try {
                 const { data, error } = await supabase
-                    .from('profiles')
-                    .update({ lang: auth.lang })
-                    .eq('id', this.auth.PROFILE_AUTH_ID)
+                    .from('profile_devices')
+                    .select('profile_id, device_id, devices(*)')
+                    .eq('profile_id', this.auth.PROFILE_AUTH_ID)
 
                 if (!error) {
-                    // console.log(data);
-
-                    this.$i18n.locale = auth.lang;
-                    this.store.toast.open = true;
-                    this.store.toast.message = this.$t('change_language');
+                    // console.log(data)
+                    this.auth.devices.data = data;
                 }
             } catch (e) {
                 console.error(e);
             }
-        },
+        }
     },
     watch: {
-        'auth.lang': {
+        'auth.PROFILE_AUTH_ID': {
             handler(value) {
-                this.handleLang();
+                this.getDevices();
             },
             deep: true
         },

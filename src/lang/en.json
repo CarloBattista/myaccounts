@@ -26,11 +26,14 @@
   "account_section": "Section account",
   "add_element": "Add element",
   "save": "Save",
+  "exit": "Exit",
   "add": "Add",
   "cancel": "Cancel",
   "you_sure": "Are you sure?",
   "select_language": "Select a language",
   "plan_and_billing": "Plan & Billing",
   "security": "Security",
+  "devices": "Devices",
+  "manage_devices": "Manage your devices",
   "change_language": "You changed the language"
 }

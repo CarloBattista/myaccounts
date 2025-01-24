@@ -88,6 +88,26 @@ export default {
         console.error(e);
       }
     },
+    async getGeolocationData() {
+      const apiKey = import.meta.env.VITE_IPINFO_KEY;
+      const apiUrl = `https://ipinfo.io/json?token=${apiKey}`;
+
+      try {
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (data) {
+          // console.log(data);
+          this.auth.deviceInfo.city = data?.city;
+          this.auth.deviceInfo.country = data?.country;
+          this.auth.deviceInfo.country_code = data?.country;
+          this.auth.deviceInfo.time_zone = data?.timezone;
+          this.auth.deviceInfo.ip_address = data?.ip;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
 
     getLang() {
       const lang = this.auth.profile.lang;
@@ -105,19 +125,24 @@ export default {
     },
     checkDevice() {
       const parser = new UAParser();
-      const deviceInfo = parser.getResult();
-      return console.log(deviceInfo)
+      const data = parser.getResult();
+      // console.log(data);
 
-      console.log(`
-                Device: ${deviceInfo.device.type}
-                OS: ${deviceInfo.os.name} ${deviceInfo.os.version}
-                Browser: ${deviceInfo.browser.name} ${deviceInfo.browser.version}
-            `);
+      if (data) {
+        this.auth.deviceInfo.model = data?.device?.model;
+        this.auth.deviceInfo.name = data?.os?.name;
+        this.auth.deviceInfo.os = data?.os?.name;
+        this.auth.deviceInfo.os_version = data?.os?.version;
+        this.auth.deviceInfo.type = data?.device?.type || "Desktop";
+        this.auth.deviceInfo.status = true;
+        this.auth.deviceInfo.user_agent = data?.ua
+      }
     }
   },
   mounted() {
     this.getUser();
     this.checkDevice();
+    this.getGeolocationData();
   },
   watch: {
     'auth.user': {

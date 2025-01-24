@@ -12,6 +12,7 @@ import Pricing from '../views/Pricing.vue';
 
 // Settings
 import Account from '../views/settings/Account.vue';
+import Devices from '../views/settings/Devices.vue';
 
 const routes = [
     // onBoard
@@ -56,10 +57,17 @@ const routes = [
     // Settings
     {
         path: '/settings/account',
-        name: 'settings',
+        name: 'settings-account',
         component: Account,
         props: true,
-        meta: { title: "MyAccounts", requiresAuth: true, role: 'auth' }
+        meta: { title: "MyAccounts • Account", requiresAuth: true, role: 'auth' }
+    },
+    {
+        path: '/settings/devices',
+        name: 'settings-devices',
+        component: Devices,
+        props: true,
+        meta: { title: "MyAccounts • Devices", requiresAuth: true, role: 'auth' }
     },
 ];
 
@@ -73,7 +81,6 @@ router.beforeEach((to, from, next) => {
     document.title = pageTitle;
 
     const isAuthenticated = localStorage.getItem('isAuthenticated') || "false";
-    console.log(isAuthenticated);
 
     if (to.name === 'pricing') {
         return next();
