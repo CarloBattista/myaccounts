@@ -35,5 +35,6 @@
   "security": "Security",
   "devices": "Devices",
   "manage_devices": "Manage your devices",
-  "change_language": "You changed the language"
+  "change_language": "You changed the language",
+  "section_currently_unavailable": "This section is currently unavailable."
 }

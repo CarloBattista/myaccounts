@@ -61,6 +61,7 @@
         <div v-if="store.modals.createVault.open || store.modals.editVault.open || store.modals.deleteVault.open || store.modals.selectedAccount.open || store.modals.createAccount.open || store.modals.editAccount.open || store.modals.deleteAccount.open"
             @click="closeModal" class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80"></div>
     </Transition>
+    
     <!-- MODAL VAULT -->
     <Transition name="modal-fade">
         <modalCreate v-if="store.modals.createVault.open" :title="$t('head_create_new_vault')">
@@ -165,7 +166,8 @@
                     </div>
                     <div v-if="store.modals.createAccount.fields.description" class="flex gap-[12px] items-start">
                         <inputText v-model="store.modals.createAccount.data.description" forInput="description" label=""
-                            placeholder="Description" :required="true" :error="store.modals.createAccount.error.description" class="w-full" />
+                            placeholder="Description" :required="true"
+                            :error="store.modals.createAccount.error.description" class="w-full" />
                         <div @click="clearField('description')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />
@@ -246,7 +248,8 @@
                     </div>
                     <div v-if="store.modals.editAccount.fields.description" class="flex gap-[12px] items-start">
                         <inputText v-model="store.modals.editAccount.data.description" forInput="description" label=""
-                            placeholder="Description" :required="true" :error="store.modals.editAccount.error.description" class="w-full" />
+                            placeholder="Description" :required="true"
+                            :error="store.modals.editAccount.error.description" class="w-full" />
                         <div @click="clearField('description')"
                             class="h-[48px] aspect-square rounded-[16px] border border-dashed border-[#7C7C7C] text-[#989898] bg-[#2E2E2E] hover:border-[#F34822] hover:text-[#F34822] hover:bg-[#F34822]/20 opacity-70 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-150">
                             <Trash2 size="20" />

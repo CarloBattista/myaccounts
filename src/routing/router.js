@@ -13,6 +13,7 @@ import Pricing from '../views/Pricing.vue';
 // Settings
 import Account from '../views/settings/Account.vue';
 import Devices from '../views/settings/Devices.vue';
+import Security from '../views/settings/Security.vue';
 
 const routes = [
     // onBoard
@@ -68,6 +69,13 @@ const routes = [
         component: Devices,
         props: true,
         meta: { title: "MyAccounts • Devices", requiresAuth: true, role: 'auth' }
+    },
+    {
+        path: '/settings/security',
+        name: 'settings-security',
+        component: Security,
+        props: true,
+        meta: { title: "MyAccounts • Security", requiresAuth: true, role: 'auth' }
     },
 ];
 

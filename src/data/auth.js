@@ -5,13 +5,15 @@ export const auth = reactive({
     session: null,
     profile: null,
     isAuthenticated: false,
+
+    PROFILE_AUTH_ID: null,
+    PROFILE_COMPLETE: true,
+
     devices: {
         data: [],
         error: null,
         loading: false
     },
-
-    PROFILE_AUTH_ID: null,
 
     deviceInfo: {
         city: "",

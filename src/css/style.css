@@ -28,6 +28,31 @@ body {
   white-space: nowrap;
 }
 
+.navItem-Inl {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 4px 0;
+  border-bottom: 2px solid;
+  
+  transition-property: color;
+  transition-duration: .15s;
+  transition-timing-function: cubic-bezier(0,0,.2,1);
+}
+
+.navItem-Inl:not(.router-link-active) {
+  color: #989898;
+  border-color: transparent;
+}
+
+.navItem-Inl:not(.router-link-active):hover {
+  color: #fff;
+}
+
+.navItem-Inl.router-link-active {
+  color: #fff;
+  border-color: #fff;
+}
+
 /* TRANSITIONS */
 
 /* OVERLAY */

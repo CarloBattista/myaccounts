@@ -127,6 +127,20 @@ export const store = reactive({
             loading: false
         },
 
+        // PROFILE
+        completeProfile: {
+            open: false,
+            data: {
+                first_name: null,
+                last_name: null,
+            },
+            error: {
+                first_name: null,
+                last_name: null,
+            },
+            loading: false
+        },
+
         account_image: null
     },
 

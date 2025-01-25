@@ -2,7 +2,7 @@
     <navbar :logo="true" :firstAction="false" :secondAction="false" :profile="true"
         :authenticated="auth.isAuthenticated" />
     <div role="main" class="main-container mt-[32px]">
-        <div class="w-full px-[20px] lg:px-[32px] min-h-screen grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
+        <div class="w-full px-[20px] lg:px-[32px] grid lg:grid-cols-[1fr,auto,minmax(auto,1fr)]">
             <div class="w-full max-w-[320px] hidden lg:flex flex-col gap-[8px]">
                 <div class="flex flex-col gap-[2px]">
                     <RouterLink to="/settings/account">
@@ -12,7 +12,7 @@
                             </template>
                         </navItem>
                     </RouterLink>
-                    <RouterLink to="/settings/plan-and-billing">
+                    <RouterLink v-if="false" to="/settings/plan-and-billing">
                         <navItem data="" :hasIcon="true" :label="$t('plan_and_billing')" class="not-vault">
                             <template #icon>
                                 <CreditCard size="20px" />
@@ -36,14 +36,17 @@
                 </div>
             </div>
             <div class="w-full lg:min-w-[670px] lg:max-w-[670px] max-w-[unset] flex flex-col gap-[24px] lg:gap-0">
-                <div class="relative w-[calc(100vw-20px*2)]"></div>
-                <div
-                    class="w-[unset] flex gap-[24px] py-[4px] px-[20px] my-[-4px] mx-[calc(20px*-1)] overflow-x-auto scrollbar-none">
+                <div class="relative w-[calc(100vw-20px*2)] block lg:hidden">
+                    <div class="w-[unset] flex gap-[24px] py-[4px] px-[20px] my-[-4px] mx-[calc(20px*-1)] overflow-x-auto scrollbar-none">
+                        <RouterLink to="/settings/account" class="navItem-Inl">Account</RouterLink>
+                        <RouterLink to="/settings/security" class="navItem-Inl">{{ $t('security') }}</RouterLink>
+                        <RouterLink to="/settings/devices" class="navItem-Inl">{{ $t('devices') }}</RouterLink>
+                    </div>
                 </div>
                 <div class="w-full flex flex-col gap-[48px]">
-                    <section class="w-full flex flex-col gap-[16px]">
+                    <section class="w-full flex flex-col gap-[24px]">
                         <div class="w-full">
-                            <h2 class="text-white text-2xl font-medium">{{ $t('manage_devices') }}</h2>
+                            <h2 class="text-white text-3xl font-medium">{{ $t('manage_devices') }}</h2>
                         </div>
                         <div class="w-full grid grid-cols-1 md:grid-cols-2">
                             <div v-for="(device, deviceIndex) in auth.devices.data" :key="deviceIndex"
@@ -62,7 +65,7 @@
                                         <div class="h-[20px] aspect-square flex items-center justify-center">
                                             <Clock size="16" />
                                         </div>
-                                        <span>{{ device.devices?.updated_at }}</span>
+                                        <span>{{ formatDate(device.devices?.updated_at) }}</span>
                                     </div>
                                     <div class="w-full flex gap-[8px] items-center text-[#989898] text-sm">
                                         <div class="h-[20px] aspect-square flex items-center justify-center">
@@ -89,6 +92,9 @@
 import { supabase } from '../../lib/supabase';
 import { auth } from '../../data/auth';
 import { store } from '../../data/store';
+
+import dayjs from 'dayjs';
+import 'dayjs/locale/it';
 
 import navbar from '../../components/nav/navbar.vue';
 import navItem from '../../components/nav/nav-item.vue';
@@ -141,15 +147,26 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-        }
+        },
+
+        formatDate(dateString) {
+            const locale = localStorage.getItem('locale');
+
+            if (locale) {
+                dayjs.locale(locale);
+            }
+
+            return dayjs(dateString).format('DD MMM YYYY · HH:mm');
+        },
     },
     watch: {
         'auth.PROFILE_AUTH_ID': {
             handler(value) {
                 this.getDevices();
             },
+            immediate: true,
             deep: true
-        },
+        }
     }
 }
 </script>

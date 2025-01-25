@@ -1,6 +1,6 @@
 <template>
   <div>
-    <RouterView />
+    <RouterView @profile-completed="getProfile" />
     <Transition name="toast-fade">
       <toast v-if="store.toast.open">
         <template #icon>
@@ -137,7 +137,7 @@ export default {
         this.auth.deviceInfo.status = true;
         this.auth.deviceInfo.user_agent = data?.ua
       }
-    }
+    },
   },
   mounted() {
     this.getUser();
@@ -160,6 +160,12 @@ export default {
           this.auth.PROFILE_AUTH_ID = value.id;
         } else {
           this.auth.PROFILE_AUTH_ID = null;
+        }
+
+        if (!value.first_name && !value.last_name) {
+          this.auth.PROFILE_COMPLETE = false;
+        } else {
+          this.auth.PROFILE_COMPLETE = true;
         }
 
         this.getLang();
