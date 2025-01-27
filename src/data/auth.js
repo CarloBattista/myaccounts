@@ -30,5 +30,9 @@ export const auth = reactive({
         user_agent: ""
     },
 
+    deleteAccount: {
+        open: false
+    },
+
     lang: "en",
 });

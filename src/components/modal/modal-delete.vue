@@ -27,6 +27,9 @@
 </template>
 
 <script>
+import { store } from '../../data/store';
+import { auth } from '../../data/auth';
+
 // ICONS
 import { X } from 'lucide-vue-next';
 
@@ -39,6 +42,19 @@ export default {
     props: {
         head: String,
         paragraph: String
+    },
+    data() {
+        return {
+            store,
+            auth
+        }
+    },
+    methods: {
+        closeModal() {
+            if (this.auth.deleteAccount.open) {
+                this.auth.deleteAccount.open = false;
+            }
+        }
     }
 }
 </script>

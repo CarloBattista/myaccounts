@@ -1,6 +1,6 @@
 <template>
     <div @click="toggleProfileMenu" ref="profileMenu" class="relative">
-        <div class="avatar-dot relative aspect-square rounded-full flex items-center justify-center bg-[#2E2E2E] text-white"
+        <div class="avatar-dot relative aspect-square rounded-full flex items-center justify-center bg-[#2E2E2E] text-[#989898]"
             :class="'avatar-' + size, { 'cursor-pointer': hasInputFile || hasProfileMenu }">
             <span class="name-initial w-full flex items-center justify-center text-center font-semibold uppercase">{{
                 auth.profile?.first_name ? auth.profile?.first_name?.charAt(0) : auth.user?.email?.charAt(0) }}</span>
@@ -15,7 +15,7 @@
                                 auth.profile?.last_name }}</h2>
                             <h3 class="text-[#989898] text-sm font-normal">{{ auth.user?.email }}</h3>
                         </div>
-                        <buttonFl type="tertiary" :disabled="false" :loading="false" :label="$t('setup_profile')"
+                        <buttonFl v-if="!auth.PROFILE_COMPLETE" @click="store.modals.completeProfile.open = !store.modals.completeProfile.open" type="tertiary" :disabled="false" :loading="false" :label="$t('setup_profile')"
                             class="h-[36px] text-sm" />
                         <RouterLink to="/pricing">
                             <buttonFl v-if="!auth.profile?.is_subscribed" type="secondary" :disabled="false"

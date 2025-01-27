@@ -36,5 +36,9 @@
   "devices": "Dispositivi",
   "manage_devices": "Gestisci i tuoi dispositivi",
   "change_language": "Hai cambiato la lingua",
-  "section_currently_unavailable": "Questa sezione non è al momento disponibile."
+  "section_currently_unavailable": "Questa sezione non è al momento disponibile.",
+  "description_delete_account": "Elimina definitivamente il tuo MyAccount.",
+  "alert_deleting_account": "L'eliminazione del tuo account è permanente e irreversibile. Perderai tutti i tuoi account e le cassaforti, se presenti.",
+  "personal_details": "Dettagli personali",
+  "manage_account": "Gestisci account"
 }

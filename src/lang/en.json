@@ -36,5 +36,9 @@
   "devices": "Devices",
   "manage_devices": "Manage your devices",
   "change_language": "You changed the language",
-  "section_currently_unavailable": "This section is currently unavailable."
+  "section_currently_unavailable": "This section is currently unavailable.",
+  "description_delete_account": "Permanently delete your MyAccount.",
+  "alert_deleting_account": "Deleting your account is permanent and irreversible. You will lose all your accounts and vaults, if any.",
+  "personal_details": "Personal details",
+  "manage_account": "Manage account"
 }

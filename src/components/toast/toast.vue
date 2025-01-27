@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed bottom-[24px] left-0 w-full flex items-center justify-center">
+    <div class="fixed z-[9999999999] bottom-[24px] left-0 w-full flex items-center justify-center">
         <div class="max-w-[670px] mx-auto group">
             <div @mouseover="enter = true" @mouseleave="enter = false"
                 class="relative w-fit h-[60px] p-[8px] rounded-full flex gap-[12px] items-center bg-white text-black text-base font-medium transition duration-300 ease-in-out pointer-events-none">

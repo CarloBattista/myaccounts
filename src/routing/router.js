@@ -88,19 +88,21 @@ router.beforeEach((to, from, next) => {
     const pageTitle = to.meta.title || "MyAccounts";
     document.title = pageTitle;
 
-    const isAuthenticated = localStorage.getItem('isAuthenticated') || "false";
+    const stringAuth = localStorage.getItem('isAuthenticated') || "false";
+    const isAuthenticated = JSON.parse(stringAuth);
+    console.log(isAuthenticated);
 
     if (to.name === 'pricing') {
         return next();
     }
 
     // Reindirizza alla home se un utente autenticato prova ad accedere a pagine per guest
-    if (to.meta.role === 'guest' && isAuthenticated === "true" && isAuthenticated) {
+    if (to.meta.role === 'guest' && isAuthenticated) {
         return next({ name: 'home' });
     }
 
     // Reindirizza alla pagina di login se un utente non autenticato prova ad accedere a pagine protette
-    if (to.meta.role === 'auth' && isAuthenticated === "false" && !isAuthenticated) {
+    if (to.meta.role === 'auth' && !isAuthenticated) {
         return next({ name: 'identity-login' });
     }
 

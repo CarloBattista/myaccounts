@@ -48,7 +48,14 @@
                         <div class="w-full">
                             <h2 class="text-white text-3xl font-medium">{{ $t('manage_devices') }}</h2>
                         </div>
-                        <div class="w-full grid grid-cols-1 md:grid-cols-2">
+                        <div class="w-full">
+                            <banner :hasIcon="true" :hasActions="false" :message="$t('section_currently_unavailable')">
+                                <template #icon>
+                                    <LockKeyhole size="20" />
+                                </template>
+                            </banner>
+                        </div>
+                        <div v-if="false" class="w-full grid grid-cols-1 md:grid-cols-2">
                             <div v-for="(device, deviceIndex) in auth.devices.data" :key="deviceIndex"
                                 class="w-full min-h-[150px] rounded-[24px] p-[12px] bg-[#2E2E2E]">
                                 <div class="w-full flex gap-[12px] items-center justify-start">
@@ -99,6 +106,7 @@ import 'dayjs/locale/it';
 import navbar from '../../components/nav/navbar.vue';
 import navItem from '../../components/nav/nav-item.vue';
 import buttonFl from '../../components/button/button-fl.vue';
+import banner from '../../components/banner/banner.vue';
 
 // ICONS
 import { Check, User, CreditCard, LockKeyhole, Laptop, LaptopMinimal, Smartphone, Tablet, Clock, MapPin } from 'lucide-vue-next';
@@ -109,6 +117,7 @@ export default {
         navbar,
         navItem,
         buttonFl,
+        banner,
 
         // ICONS
         Check,
@@ -130,6 +139,8 @@ export default {
     },
     methods: {
         async getDevices() {
+            return;
+
             if (!this.auth.PROFILE_AUTH_ID) {
                 return;
             }

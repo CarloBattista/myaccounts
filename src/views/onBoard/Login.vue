@@ -109,6 +109,7 @@ export default {
                     this.auth.user = data.user;
                     this.auth.session = data.session;
                     this.auth.isAuthenticated = true;
+                    localStorage.setItem('isAuthenticated', true);
 
                     // Clear inputs after login
                     this.fields.data.email = "";

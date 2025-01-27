@@ -1,6 +1,6 @@
 <template>
   <div>
-    <RouterView @profile-completed="getProfile" />
+    <RouterView @profile-completed="getProfile" @profile-updated="getProfile" />
     <Transition name="toast-fade">
       <toast v-if="store.toast.open">
         <template #icon>
@@ -11,6 +11,31 @@
       </toast>
     </Transition>
   </div>
+
+  <!-- OVERLAY -->
+  <Transition name="overlay-modal-fade">
+    <div v-if="store.modals.completeProfile.open && !this.auth.PROFILE_COMPLETE"
+      @click="store.modals.completeProfile.open = false"
+      class="fixed z-[99999] top-0 left-0 w-full h-screen bg-black/80">
+    </div>
+  </Transition>
+
+  <!-- MODAL PROFILE -->
+  <Transition name="modal-fade">
+    <modalCreate v-if="store.modals.completeProfile.open && !this.auth.PROFILE_COMPLETE"
+      :title="$t('head_create_new_account')">
+      <template #inner>
+        <form @submit.prevent class="w-full flex flex-col gap-[16px]">
+          <inputField v-model="store.modals.completeProfile.data.first_name" type="text" forInput="firstName" label=""
+            placeholder="First name" :required="true" :error="store.modals.completeProfile.error.first_name" />
+          <inputField v-model="store.modals.completeProfile.data.last_name" type="text" forInput="lastName" label=""
+            placeholder="Last name" :required="true" :error="store.modals.completeProfile.error.last_name" />
+          <buttonFl @click="completeProfile" type="primary" size="default" :hasIcon="false"
+            :loading="store.modals.completeProfile.loading" :label="$t('save')" class="w-full" />
+        </form>
+      </template>
+    </modalCreate>
+  </Transition>
 </template>
 
 <script>
@@ -23,6 +48,9 @@ import { UAParser } from 'ua-parser-js';
 import i18n from "./lib/i18n";
 
 import toast from "./components/toast/toast.vue";
+import modalCreate from "./components/modal/modal-create.vue";
+import inputField from "./components/input/input-field.vue";
+import buttonFl from "./components/button/button-fl.vue";
 
 // ICONS
 import { Check, ShieldAlert, ShieldX } from 'lucide-vue-next'
@@ -31,6 +59,9 @@ export default {
   name: "App",
   components: {
     toast,
+    modalCreate,
+    inputField,
+    buttonFl,
 
     // ICONS
     Check,
@@ -106,6 +137,47 @@ export default {
         }
       } catch (e) {
         console.error(e);
+      }
+    },
+    async completeProfile() {
+      this.store.modals.completeProfile.loading = true;
+
+      const fieldData = this.store.modals.completeProfile.data;
+
+      if (this.auth.PROFILE_COMPLETE) {
+        this.store.modals.completeProfile.open = false;
+        this.store.modals.completeProfile.loading = false;
+        return;
+      }
+
+      if (!fieldData.first_name || !fieldData.last_name) {
+        this.store.modals.completeProfile.error.first_name = "Il nome è obbligatorio.";
+        this.store.modals.completeProfile.error.last_name = "Il cognome è obbligatorio.";
+        this.store.modals.completeProfile.loading = false;
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .update({ first_name: fieldData?.first_name, last_name: fieldData?.last_name })
+          .eq('id', this.auth.PROFILE_AUTH_ID)
+
+        if (!error) {
+          // console.log(data);
+
+          this.getProfile();
+          this.store.modals.completeProfile.open = false;
+          this.store.modals.completeProfile.data.first_name = null;
+          this.store.modals.completeProfile.data.last_name = null;
+          this.store.modals.completeProfile.error.first_name = null;
+          this.store.modals.completeProfile.error.last_name = null;
+        }
+      } catch (e) {
+        console.error(e);
+        this.store.modals.completeProfile.open = false;
+      } finally {
+        this.store.modals.completeProfile.loading = false;
       }
     },
 
@@ -199,6 +271,17 @@ export default {
         }
 
         if (value.editAccount.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
+      },
+      immediate: true,
+      deep: true
+    },
+    'auth.deleteAccount': {
+      handler(value) {
+        if (value.open) {
           document.body.classList.add("overflow-hidden");
         } else {
           document.body.classList.remove("overflow-hidden");
