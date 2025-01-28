@@ -1101,6 +1101,32 @@ export default {
             }
         },
 
+        listenToAccountsRealtime() {
+            supabase
+                .channel('realtime:accounts')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'accounts' },
+                    (payload) => {
+                        console.log('Change detected:', payload);
+
+                        // Gestisci i diversi eventi
+                        if (payload.eventType === 'INSERT') {
+                            console.log('New account added:', payload.new);
+                        } else if (payload.eventType === 'UPDATE') {
+                            console.log('Account updated:', payload.new);
+                        } else if (payload.eventType === 'DELETE') {
+                            console.log('Account deleted:', payload.old);
+                        }
+                    }
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('Listening to accounts changes in realtime.');
+                    }
+                });
+        },
+
         closeModal() {
             if (this.store.modals.createVault.open) {
                 this.store.modals.createVault.open = false;
@@ -1377,6 +1403,9 @@ export default {
             },
             deep: true
         },
+    },
+    mounted() {
+        this.listenToAccountsRealtime();
     }
 }
 </script>

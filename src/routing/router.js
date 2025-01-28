@@ -90,7 +90,6 @@ router.beforeEach((to, from, next) => {
 
     const stringAuth = localStorage.getItem('isAuthenticated') || "false";
     const isAuthenticated = JSON.parse(stringAuth);
-    console.log(isAuthenticated);
 
     if (to.name === 'pricing') {
         return next();
