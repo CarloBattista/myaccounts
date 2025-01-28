@@ -275,6 +275,12 @@ export default {
         } else {
           document.body.classList.remove("overflow-hidden");
         }
+
+        if (value.selectedAccount.open) {
+          document.body.classList.add("overflow-hidden");
+        } else {
+          document.body.classList.remove("overflow-hidden");
+        }
       },
       immediate: true,
       deep: true

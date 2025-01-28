@@ -92,20 +92,20 @@
                                 :class="{ 'h-[70px] md:h-[72px]': !dataField.data.full_name.open, 'h-[unset] md:h-[unset]': dataField.data.full_name.open }">
                                 <div class="flex flex-col gap-[24px] grow">
                                     <div class="w-full">
-                                        <h2 class="text-white text-base font-medium truncate">{{
+                                        <h2 class="text-white text-base font-medium">{{
                                             dataField.data.full_name.open ?
                                                 'Edit name' : 'Name' }}</h2>
                                         <h3 v-if="!dataField.data.full_name.open"
-                                            class="text-[#989898] text-sm font-normal truncate">{{
+                                            class="text-[#989898] text-sm font-normal">{{
                                                 auth.profile?.first_name }} {{
                                                 auth.profile?.last_name }}</h3>
-                                        <h3 v-else class="text-[#989898] text-sm font-normal truncate">This will be
+                                        <h3 v-else class="text-[#989898] text-sm font-normal">This will be
                                             visible on your
                                             profile and for your other team members if you’re in a team</h3>
                                     </div>
                                     <div v-if="dataField.data.full_name.open" class="w-full grow">
                                         <form @submit.prevent class="w-full flex flex-col gap-[24px]">
-                                            <div class="w-full flex gap-[16px] items-start">
+                                            <div class="w-full flex gap-[16px] flex-col sm:flex-row items-start">
                                                 <inputField v-model="dataField.data.full_name.data.first_name"
                                                     type="text" forInput="firstName" label="First name" placeholder=""
                                                     :required="true" :error="dataField.data.full_name.error.first_name"
@@ -129,10 +129,10 @@
                                 :class="{ 'h-[70px] md:h-[72px]': !dataField.data.email.open, 'h-[unset] md:h-[unset]': dataField.data.email.open }">
                                 <div class="flex flex-col gap-[24px] grow">
                                     <div class="w-full">
-                                        <h2 class="text-white text-base font-medium truncate">{{ dataField.data.email.open ? 'Edit email address' : 'Email address' }}</h2>
+                                        <h2 class="text-white text-base font-medium">{{ dataField.data.email.open ? 'Edit email address' : 'Email address' }}</h2>
                                         <h3 v-if="!dataField.data.email.open"
-                                            class="text-[#989898] text-sm font-normal truncate">{{ auth.user?.new_email ? auth.user?.new_email : auth.user?.email }}</h3>
-                                        <h3 v-else class="text-[#989898] text-sm font-normal truncate">This will be used
+                                            class="text-[#989898] text-sm font-normal">{{ auth.user?.new_email ? auth.user?.new_email : auth.user?.email }}</h3>
+                                        <h3 v-else class="text-[#989898] text-sm font-normal">This will be used
                                             for logging
                                             in and account recovery.
                                         </h3>
@@ -143,7 +143,7 @@
                                                 forInput="firstName" label="Email address" placeholder=""
                                                 :required="true" :error="dataField.data.email.error.email" />
                                             <buttonFl @click="actionUpdateEmail" type="primary" size="default"
-                                                :hasIcon="false" :loading="dataField.data.full_name.loading"
+                                                :hasIcon="false" :loading="dataField.data.email.loading"
                                                 :label="$t('save')" class="w-fit" />
                                         </form>
                                     </div>
@@ -156,18 +156,18 @@
                                 :class="{ 'h-[70px] md:h-[72px]': !dataField.data.password.open, 'h-[unset] md:h-[unset]': dataField.data.password.open }">
                                 <div class="flex flex-col gap-[24px] grow">
                                     <div class="w-full">
-                                        <h2 class="text-white text-base font-medium truncate">{{
+                                        <h2 class="text-white text-base font-medium">{{
                                             dataField.data.password.open ?
                                             'Edit password' : 'Password' }}</h2>
                                         <h3 v-if="!dataField.data.password.open"
-                                            class="text-[#989898] text-sm font-normal truncate">••••••••••••</h3>
-                                        <h3 v-else class="text-[#989898] text-sm font-normal truncate">Password needs to
+                                            class="text-[#989898] text-sm font-normal">••••••••••••</h3>
+                                        <h3 v-else class="text-[#989898] text-sm font-normal">Password needs to
                                             be 8
                                             characters and contain at least one alphabet and one number.</h3>
                                     </div>
                                     <div v-if="dataField.data.password.open" class="w-full grow">
                                         <form @submit.prevent class="w-full flex flex-col gap-[24px]">
-                                            <div class="w-full flex gap-[16px] items-start">
+                                            <div class="w-full flex gap-[16px] flex-col sm:flex-row items-start">
                                                 <inputField v-model="dataField.data.password.data.password" type="password"
                                                     forInput="password" label="New password"
                                                     placeholder="Enter password" :required="true"
@@ -186,7 +186,7 @@
                                 </div>
                                 <button @click="dataField.data.password.open = !dataField.data.password.open"
                                     class="text-white text-sm font-medium hover:underline cursor-pointer">{{
-                                        dataField.data.email.open ? 'Cancel' : 'Edit' }}</button>
+                                        dataField.data.password.open ? 'Cancel' : 'Edit' }}</button>
                             </div>
                         </div>
                     </section>
@@ -508,6 +508,10 @@ export default {
                     this.dataField.data.email.data.email = value?.new_email;
 
                     this.dataField.data.email.oldData.email = value?.new_email;
+                } else {
+                    this.dataField.data.email.data.email = value?.email;
+
+                    this.dataField.data.email.oldData.email = value?.email;
                 }
             },
             immediate: true,
